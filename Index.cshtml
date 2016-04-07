@@ -1,0 +1,176 @@
+﻿
+@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Freelan.Models.Code
+@using PagedList;
+@using PagedList.Mvc;
+@using ProjectTimi.Code
+@using ProjectTimi.Models
+@model IPagedList<ProjectTimi.Models.Project>
+
+<div class="container">
+    <div class="row">
+
+        <div class="col-sm-12 col-md-12 col-lg-12">
+
+            <div id="jssor_1" style="margin-top: -23px;width: 1300px; height: 500px; overflow: hidden; visibility: hidden;">
+                <!-- Loading Screen -->
+                <div data-u="loading" style="position: absolute; top: 0px; left: 0px;">
+                    <div style="filter: alpha(opacity=70); opacity: 0.7; position: absolute; display: block; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+                    <div style="position:absolute;display:block;background:url('~/Content/img/loading.gif') no-repeat center center;top:0px;left:0px;width:100%;height:100%;"></div>
+                </div>
+                <div data-u="slides" style="cursor: default; position: relative; top: 0px; left: 0px; width: 1300px; height: 500px; overflow: hidden;">
+                    <div data-p="225.00" style="display: none;">
+                        <img data-u="image" src="~/Content/img/red.jpg" />
+                        <div style="position: absolute; top: 30px; left: 30px; width: 480px; height: 120px; font-size: 50px; color: #ffffff; line-height: 60px;">TOUCH SWIPE SLIDER</div>
+                        <div style="position: absolute; top: 300px; left: 30px; width: 480px; height: 120px; font-size: 30px; color: #ffffff; line-height: 38px;">Build your slider with anything, includes image, content, text, html, photo, picture</div>
+                        <div data-u="caption" data-t="0" style="position: absolute; top: 100px; left: 600px; width: 445px; height: 300px;">
+                            <img src="~/Content/img/c-phone.png" style="position: absolute; top: 0px; left: 0px; width: 445px; height: 300px;" />
+                            <img src="~/Content/img/c-jssor-slider.png" data-u="caption" data-t="1" style="position: absolute; top: 70px; left: 130px; width: 102px; height: 78px;" />
+                            <img src="~/Content/img/c-text.png" data-u="caption" data-t="2" style="position: absolute; top: 153px; left: 163px; width: 80px; height: 53px;" />
+                            <img src="~/Content/img/c-fruit.png" data-u="caption" data-t="3" style="position: absolute; top: 60px; left: 220px; width: 140px; height: 90px;" />
+                            <img src="~/Content/img/c-navigator.png" data-u="caption" data-t="4" style="position: absolute; top: -123px; left: 121px; width: 200px; height: 155px;" />
+                        </div>
+                        <div data-u="caption" data-t="5" style="position: absolute; top: 120px; left: 650px; width: 470px; height: 220px;">
+                            <img src="~/Content/img/c-phone-horizontal.png" style="position: absolute; top: 0px; left: 0px; width: 470px; height: 220px;" />
+                            <div style="position: absolute; top: 4px; left: 45px; width: 379px; height: 213px; overflow: hidden;">
+                                <img src="~/Content/img/c-slide-1.jpg" data-u="caption" data-t="6" style="position: absolute; top: 0px; left: 0px; width: 379px; height: 213px;" />
+                                <img src="~/Content/img/c-slide-3.jpg" data-u="caption" data-t="7" style="position: absolute; top: 0px; left: 379px; width: 379px; height: 213px;" />
+                            </div>
+                            <img src="~/Content/img/c-navigator-horizontal.png" style="position: absolute; top: 4px; left: 45px; width: 379px; height: 213px;" />
+                            <img src="~/Content/img/c-finger-pointing.png" data-u="caption" data-t="8" style="position: absolute; top: 740px; left: 1600px; width: 257px; height: 300px;" />
+                        </div>
+                    </div>
+                    <div data-p="225.00" style="display: none;">
+                        <img data-u="image" src="~/Content/img/purple.jpg" />
+                    </div>
+                    <div data-p="225.00" style="display: none;">
+                        <img data-u="image" src="~/Content/img/blue.jpg" />
+                    </div>
+                </div>
+                <!-- Bullet Navigator -->
+                <div data-u="navigator" class="jssorb05" style="bottom:16px;right:16px;" data-autocenter="1">
+                    <!-- bullet navigator item prototype -->
+                    <div data-u="prototype" style="width:16px;height:16px;"></div>
+                </div>
+                <!-- Arrow Navigator -->
+                <span data-u="arrowleft" class="jssora22l" style="top:0px;left:12px;width:40px;height:58px;" data-autocenter="2"></span>
+                <span data-u="arrowright" class="jssora22r" style="top:0px;right:12px;width:40px;height:58px;" data-autocenter="2"></span>
+                <a href="http://www.jssor.com" style="display:none">Slideshow Maker</a>
+            </div>
+            <script>
+                jssor_1_slider_init();
+            </script>
+        </div>
+    </div>
+</div>
+
+<div class="container div_content">
+    <div class="row">
+        <div class="col-md-3 menu_left">
+            @{Html.RenderAction("Index", "Menu");}
+        </div>
+        <div class="col-md-9 ">
+            <!--content_right-->
+            <div class="row content_right">
+                @if (Model.Count > 0)
+                { 
+                <!--content_right tren-->
+                    foreach (var item in Model)
+                    {
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-1 hinh_kh">
+                                    <!--hinh kh-->
+                                    <a href="#"><img src="~/Content/img/images/hinh_kh_03.gif"/></a>
+                                </div><!--kt_ hinh kh-->
+                                <div class="col-sm-12 col-md-12 col-lg-11">
+                                    <!--dan thoai-->
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-12 ten_kh_hang">
+                                            <a href="@Url.Action("Detail", "Project", new { ID  = item.ID})">@item.Name</a>
+                                        </div>
+
+                                        @{
+                                            List<quotation> list_quotation = ProjectCode.GetQuotations(item.ID);
+                                            int count = list_quotation.Count;
+                                        }
+
+                                        <div class="col-sm-12 col-md-12 col-lg-12 thoi_gian1">
+                                            <i><strong>@count</strong> lượt báo giá</i>
+                                        </div>
+                                    </div>
+                                </div><!--tk dan thoai-->
+                            </div>
+                            <div class="scroll_kh_hang">
+                                @foreach (var quotation in list_quotation)
+                                {
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12 col-lg-1 hinh_kh123">
+                                            <!--hinh kh123-->
+                                            <a href="#"><img src="~/Content/img/images/ten_kh1_03.gif"/></a>
+                                        </div><!--kt_ hinh kh-->
+                                        <div class="col-sm-12 col-md-12 col-lg-8">
+                                            <!--dan thoai-->
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-12 col-lg-12 ten_kh_hang123">
+                                                    <a href="@Url.Action("Index", "Profile", new { userID = ProjectCode.GetCodeUser(quotation.IDAccount) })"><b>@(ProjectCode.GetNameCompany(quotation.IDAccount))</b></a> đã đặt cọc giá <strong>@(quotation.Price + " " + ProjectCode.GetCurrency(item.IDCurrentcy))</strong>
+                                                </div>
+                                                <div class="col-sm-12 col-md-12 col-lg-12 thoi_gian1">
+                                                    <i>@FieldCode.GetTimePost(quotation.DatePost.Value)</i>
+                                                </div>
+                                            </div>
+                                        </div><!--tk dan thoai-->
+                                        <div class="col-sm-12 col-md-12 col-lg-3">
+                                          
+                                        </div><!--sao-->
+                                        <div class="col-sm-12 col-md-12 col-lg-12 hinh_kh123">
+                                            <p>@( quotation.Description + "...")<a href="@Url.Action("Quotation", "Project", new { ID = quotation.ID })"><i>Xem thêm</i></a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                        <!--kt_content right trên-->
+                    }
+                
+                <div class="pageadmin page_index">
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Home", new { pageHead = page, pageFoot = SessionHelper.GetPageFootSession() }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+                    <div id="pageInfo" class="pageInfo">Trang: @Model.PageNumber / @Model.PageCount</div>
+                </div>
+                }
+            </div>
+
+            <div class="row content_right">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    @if (ViewBag.Model != null)
+                    {
+                        foreach (var item in (PagedList.IPagedList<Project>)ViewBag.Model)
+                        {
+                            Html.RenderPartial("_DisplayAProject", item);
+                        }
+
+                        PagedList.IPagedList<Project> pagefoot = (PagedList.IPagedList<Project>)ViewBag.Model;
+                        
+                        <div class="pageadmin  page_index">
+                            @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", "Home", new { pageHead = SessionHelper.GetPageHeadSession(), pageFoot = page }), PagedListRenderOptions.OnlyShowFivePagesAtATime)
+                            <div id="pageInfo" class="pageInfo">Trang:@pagefoot.PageNumber/@pagefoot.PageCount </div>
+                        </div>
+                    }
+                    else
+                    {
+
+                    }
+                   
+                </div>
+              
+            </div>
+        </div><!--kt_content right-->
+    </div>
+</div><!--kt_content-->
+
+

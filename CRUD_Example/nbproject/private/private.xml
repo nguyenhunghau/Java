@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/nbproject/build-impl.xml</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/src/java/Business/StudentServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/View/Share/menu_left.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/src/java/Business/UpdateStudentServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/src/java/DAO/ConnectData.java</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/View/Content/newstudent.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/View/Share/header.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/Css/style.css</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/View/Content/updatestudent.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/Css/main.css</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/View/Content/studentmanager.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/src/java/Business/AddStudentServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/src/java/DAO/StudentDao.java</file>
+            <file>file:/C:/Users/UpdatusUser/Desktop/CRUD_Example/web/Css/index.css</file>
+        </group>
+    </open-files>
+</project-private>
