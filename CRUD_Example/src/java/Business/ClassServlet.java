@@ -76,23 +76,26 @@ public class ClassServlet extends HttpServlet {
         
         String path = request.getServletPath();
         HttpSession sessions = request.getSession();
+        if(sessions.getAttribute("user") == null)
+            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
         ClassStudy classStudy = new ClassStudy();
         ClassStudyDao classDao = new ClassStudyDao();
         String strMessage = "";
         String strUrl = "/CRUD_Example/faces/View/Content/classmanager.jsp";
+        String strClassId = request.getParameter("ID");
         
         try {
             switch(path){
                 case "/addClass":
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
-                    classStudy.setName(request.getParameter("NameClass"));
+                    classStudy.setName(request.getParameter("Name"));
                     if(classDao.addNewClass(classStudy))
                         strMessage = "Add class successful";
                     else
                         strMessage = "Can not insert class";
                     break;
                 case "/updateClass":
-                    classStudy.setId(Integer.valueOf(request.getParameter("ID")));
+                    classStudy.setId(Integer.valueOf(strClassId));
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
                     classStudy.setName(request.getParameter("NameClass"));
                     if(classDao.updateClass(classStudy))

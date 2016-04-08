@@ -18,11 +18,17 @@
         <jsp:include page = "../Share/header.jsp"></jsp:include>
         <%
             ClassStudyDao classStudyDao = new ClassStudyDao();
-            List<ClassStudy> listClass = classStudyDao.getListClass("1");
+            HttpSession sessions = request.getSession();
+            
             //Check ID to delete
             String strId = request.getParameter("ID");
             if(strId != null){
                 classStudyDao.deleteClass(Integer.valueOf(strId));
+            }
+            List<ClassStudy> listClass = classStudyDao.getListClass("1");
+            String strMessage = (String)sessions.getAttribute("message");
+            if(strMessage == null){
+                strMessage = "";
             }
         %>
         <div class="container div-content">
@@ -38,6 +44,9 @@
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
+                                            <div class="form-group col-md-12">
+                                                        <label class="col-md-12" ><%=strMessage %> </label>
+                                            </div>
                                             <div class="row">
                                                 <h3 style="text-align: center;color: red">Class manager</h3>
                                             </div>
@@ -81,7 +90,7 @@
                                                                 </td>
                                                                
                                                                  <td align = "center">
-                                                                     <a href= "<%= "updateclass.jsp?ID=" + listClass.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
+                                                                     <a href= "<%= "updateclass.jsp?ID=" + listClass.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt="" /></a>
                                                                 </td>
                                                                 <td align = "center">
                                                                     <a href= "<%= "classmanager.jsp?ID=" + listClass.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>

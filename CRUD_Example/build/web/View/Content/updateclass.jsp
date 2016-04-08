@@ -37,8 +37,8 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form name =" myform" onsubmit="return myFunction();" action = "../../addNewStudent" method="post"  />
-                                                    <input type="hidden" class = "form-control" id="name" Name = "ID" value = <%=strClassId %>/>
+                                                <form name =" myform" onsubmit="return myFunction();" action = "../../updateClass" method="post"  />
+                                                    <input type="hidden" class = "form-control" id="name" name = "ID" value = <%=strClassId %>/>
                                                             
                                                     <div class="row">
                                                         <div class="form-group col-md-12">

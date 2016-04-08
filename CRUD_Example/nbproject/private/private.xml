@@ -7,14 +7,17 @@
             <file>file:/root/new/CRUD_Example/web/View/Content/studentmanager.jsp</file>
             <file>file:/root/new/CRUD_Example/web/View/Content/newstudent.jsp</file>
             <file>file:/root/new/CRUD_Example/src/java/Business/LoginServlet.java</file>
-            <file>file:/root/new/CRUD_Example/web/View/Content/classmanager.jsp</file>
             <file>file:/root/new/CRUD_Example/web/View/Content/scoremanager.jsp</file>
             <file>file:/root/new/CRUD_Example/src/java/DAO/ClassStudyDao.java</file>
             <file>file:/root/new/CRUD_Example/web/View/Content/newclass.jsp</file>
+            <file>file:/root/new/CRUD_Example/src/java/Business/ClassServlet.java</file>
+            <file>file:/root/new/CRUD_Example/web/WEB-INF/web.xml</file>
+            <file>file:/root/new/CRUD_Example/web/View/Content/updateclass.jsp</file>
+            <file>file:/root/new/CRUD_Example/web/View/Content/updatestudent.jsp</file>
+            <file>file:/root/new/CRUD_Example/web/View/Content/classmanager.jsp</file>
             <file>file:/root/new/CRUD_Example/src/java/DAO/StudentDao.java</file>
             <file>file:/root/new/CRUD_Example/src/java/DAO/SemesterDao.java</file>
             <file>file:/root/new/CRUD_Example/src/java/Business/ScoreServlet.java</file>
-            <file>file:/root/new/CRUD_Example/src/java/Business/ClassServlet.java</file>
         </group>
     </open-files>
 </project-private>

@@ -47,7 +47,8 @@
             <div id="class" class="panel-collapse collapse" style="height: 0px;">
                 <div class="panel-body">
                     <ul>
-                        <li><a href="">Add class</a></li>
+                        <li><a href="/CRUD_Example/faces/View/Content/classmanager.jsp">Get list class</a></li>
+                        <li><a href="/CRUD_Example/faces/View/Content/newclass.jsp">Add class</a></li>
                     </ul>
                 </div>
             </div>

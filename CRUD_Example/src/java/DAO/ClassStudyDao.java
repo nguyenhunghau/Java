@@ -47,7 +47,7 @@ public class ClassStudyDao {
                
                classStudy.setId(rs.getInt("ID"));
                classStudy.setName(rs.getString("NameClass"));
-               classStudy.setId(rs.getInt("CourseID"));
+               classStudy.setCourseId(rs.getInt("CourseID"));
                listClass.add(classStudy);
             }
             

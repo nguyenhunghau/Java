@@ -75,6 +75,8 @@ public class StudentServlet extends HttpServlet {
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
         HttpSession session = request.getSession();
+         if(session.getAttribute("user") == null)
+            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
         
         //Set login
         if(session.getAttribute("user") == null)
@@ -96,7 +98,7 @@ public class StudentServlet extends HttpServlet {
         
         try {
             switch(path) {
-                case "getListStudent":
+                case "/getListStudent":
                      // Get Id and Name from input in form in file studentmanager.jsp
                     String Id = request.getParameter("ID");
                     String Name = request.getParameter("name");

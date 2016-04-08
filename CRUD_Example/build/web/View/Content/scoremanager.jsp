@@ -54,6 +54,10 @@
             if(listScore == null)
                 listScore = scoreDao.getListScore(strStudentId, "");
             List<Semester> listSemester = semesterDao.getListSemester(strCourseId);
+            String strMessage = (String)sessions.getAttribute("message");
+            if(strMessage == null){
+                strMessage = "";
+            }
         %>
         <jsp:include page = "../Share/header.jsp"></jsp:include>
         <div class="container div-content">
@@ -71,6 +75,9 @@
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
                                                 <form action = "../../getListScore " method="post">
+                                                    <div class="form-group col-md-12">
+                                                        <label class="col-md-12" ><%=strMessage %> </label>
+                                                    </div>
                                                     <div class="form-group col-md-12">
                                                         <label class="col-md-12" ></label>
                                                         <input type="hidden" name = "StudentId" value="<%= strStudentId %>"/>

@@ -63,7 +63,9 @@ public class ScoreServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
+        HttpSession sessions = request.getSession();
+        if(sessions.getAttribute("user") == null)
+            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
         doPost(request, response);
     }
 
@@ -82,6 +84,8 @@ public class ScoreServlet extends HttpServlet {
         ScoreDao scoreDao = new ScoreDao();
         Score score= new Score();
         HttpSession sessions = request.getSession();
+        if(sessions.getAttribute("user") == null)
+            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
         String strPath = request.getServletPath();
         String strUrl = "/CRUD_Example/faces/View/Content/scoremanager.jsp";
         String strId = request.getParameter("ID");

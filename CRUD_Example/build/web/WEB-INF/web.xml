@@ -62,15 +62,15 @@
         <url-pattern>/LoginServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ClassServlet</servlet-name>
+        <servlet-name>ClassManagerServlet</servlet-name>
         <url-pattern>/ClassManagerServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ClassServlet</servlet-name>
+        <servlet-name>ClassManagerServlet</servlet-name>
         <url-pattern>/addClass</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ClassServlet</servlet-name>
+        <servlet-name>ClassManagerServlet</servlet-name>
         <url-pattern>/updateClass</url-pattern>
     </servlet-mapping>
     <session-config>
