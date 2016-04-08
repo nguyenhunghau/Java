@@ -38,18 +38,16 @@
          <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <a data-toggle="collapse" data-parent="#accordian" href="#score" class="collapsed">
+                    <a data-toggle="collapse" data-parent="#accordian" href="#class" class="collapsed">
                         <span class="badge pull-right"><i class="fa fa-plus"></i></span>
-                        Score manager
+                        Class manager
                     </a>
                 </h4>
             </div>
-            <div id="score" class="panel-collapse collapse" style="height: 0px;">
+            <div id="class" class="panel-collapse collapse" style="height: 0px;">
                 <div class="panel-body">
                     <ul>
-                        <li><a href="">Add score</a></li>
-                        <li><a href="">Update score</a></li>
-                        <li><a href="">Get final gradle</a></li>
+                        <li><a href="">Add class</a></li>
                     </ul>
                 </div>
             </div>

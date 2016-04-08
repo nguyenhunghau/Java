@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class ConnectData {
     private Connection con;
     private Statement statement;
-    private static String connectionString = "jdbc:mysql://172.30.4.230:3306/STUDENT_MANAGER";
+    private static String connectionString = "jdbc:mysql://172.30.4.141:3306/STUDENT_MANAGER";
     private String username = "root";
     private String password = "hunghauit117";
      

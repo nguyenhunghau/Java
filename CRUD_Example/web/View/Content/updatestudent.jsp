@@ -4,6 +4,12 @@
     Author     : 12121_000
 --%>
 
+<%@page import="DTO.Course"%>
+<%@page import="DTO.ClassStudy"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.List"%>
+<%@page import="DAO.CourseDao"%>
+<%@page import="DAO.ClassStudyDao"%>
 <%@page import="DTO.Student"%>
 <%@page import="DAO.StudentDao"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -18,9 +24,20 @@
     <body>
         <jsp:include page = "../Share/header.jsp"></jsp:include>
         <%
-            String idStudent = (String)request.getParameter("ID");
+            ClassStudyDao classDao = new ClassStudyDao();
+            CourseDao courseDao = new CourseDao();
+            String idStudent = request.getParameter("ID");
             StudentDao studentDao = new StudentDao();
             Student student = studentDao.getStudent(idStudent);
+           
+            String strCourseId = request.getParameter("courseid");
+            
+            if(strCourseId == null){
+                strCourseId = "1";
+            }
+            List<Course> listCourse = courseDao.getListCourse();
+            //Get list class
+            List<ClassStudy> listClass = classDao.getListClass(strCourseId);
         %>
         <div class="container div-content">
             <div class="row">
@@ -39,7 +56,7 @@
                                                 <form action = "../../updateStudent" method="post" />
                                                     <div class="row">
                                                         <div class="form-group col-md-12">
-                                                            <label></label>
+                                                            <input type="hidden" class = "form-control" name = "ID"  value = "<%= idStudent %>" />
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -83,6 +100,60 @@
                                                             </div>
                                                         </div>
                                                     </div> 
+                                                            <div class="row">
+                                                        <div class="form-group col-md-12">
+                                                            <label class="col-md-3" >Course: </label>
+                                                            <div class="col-md-9">
+                                                                <select class = "form-control" name = "CourseId" id = "course" >
+                                                                   <%
+                                                                       for(int i = 0; i < listCourse.size(); i++){ 
+                                                                            if(strCourseId.equals(String.valueOf(listCourse.get(i).getId()))){
+                                                                    %>
+
+                                                                                <option value = "<%=listCourse.get(i).getId() %>" selected="selected">
+                                                                                    <%= listCourse.get(i).getYearBegin() + " - " + listCourse.get(i).getYearEnd() %>
+                                                                                </option>    
+
+                                                                    <% 
+                                                                            } else {
+                                                                    %>              
+                                                                                <option value = "<%=listCourse.get(i).getId() %>">
+                                                                                    <%= listCourse.get(i).getYearBegin() + " - " + listCourse.get(i).getYearEnd() %>
+                                                                                </option> 
+
+                                                                    <%      
+                                                                            }
+                                                                        }
+                                                                   %>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="form-group col-md-12">
+                                                            <label class="col-md-3" >Class: </label>
+                                                            <div class="col-md-9">
+                                                                <select class = "form-control" name = "ClassId">
+                                                                    <%
+                                                                       for(int i = 0; i < listClass.size(); i++){ 
+                                                                            if(listClass.get(i).equals(student.getClassId())){
+                                                                    %>
+
+                                                                       <option value = "<%=listClass.get(i).getId() %>" selected = "selected"><%=listClass.get(i).getName()%></option>
+                                                                    <%
+                                                                       } else {
+                                                                            
+                                                                     %>
+                                                                        <option value = "<%=listClass.get(i).getId() %>"><%=listClass.get(i).getName()%></option>
+                                                                     <%  
+                                                                        }
+                                                                    }
+                                                                    %>
+
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                     <div>
                                                         <button type="submit"  class="btn div-submit-index">Update student</button>
                                                     </div>
@@ -93,10 +164,19 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>               
             </div>
         </div><!--kt_content right-->
-       
+       <script type="text/javascript">
+            // bind change event to select
+             $('#course').bind('change', function () {
+                var url = this.value; // get selected value
+                if (url!== '') { // require a URL
+                    window.location = 'newstudent.jsp?courseid=' + url; // redirect
+                }
+                return false;
+            });
+        </script>
     </body>
 </html>
-
-</script>

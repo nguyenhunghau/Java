@@ -17,6 +17,14 @@
         <servlet-name>ScoreServlet</servlet-name>
         <servlet-class>Business.ScoreServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>Business.LoginServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ClassManagerServlet</servlet-name>
+        <servlet-class>Business.ClassServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>/faces/*</url-pattern>
@@ -48,6 +56,22 @@
     <servlet-mapping>
         <servlet-name>ScoreServlet</servlet-name>
         <url-pattern>/updateScore</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/LoginServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClassServlet</servlet-name>
+        <url-pattern>/ClassManagerServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClassServlet</servlet-name>
+        <url-pattern>/addClass</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ClassServlet</servlet-name>
+        <url-pattern>/updateClass</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

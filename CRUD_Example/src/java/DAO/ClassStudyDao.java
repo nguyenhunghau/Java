@@ -10,6 +10,7 @@ import DTO.Student;
 import com.mysql.jdbc.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 //</editor-fold>
@@ -26,17 +27,18 @@ public class ClassStudyDao {
     /**
      * Get all students in database by ID and Name
      */
-    public List getListClass(String courseId){
+    public List getListClass(String strCourseId) throws SQLException{
         
         List<ClassStudy> listClass = new ArrayList<ClassStudy>();
         //Get connection with mysql server
         Connection con = connect.getConnection();
-        String sql = "select * from Class where CourseID = " + courseId ;
+        String sql = "select * from Class where CourseID = ?";
         
         PreparedStatement prepareState;
         
         try{
             prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setString(1, strCourseId);
             ResultSet rs = prepareState.executeQuery();
             
             while(rs.next()) {
@@ -49,12 +51,76 @@ public class ClassStudyDao {
                listClass.add(classStudy);
             }
             
-            con.close();
             return listClass;
         }
         catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        } finally {
+            con.close();
         }
+    }
+    
+    public boolean addNewClass(ClassStudy classStudy) throws SQLException{
+        Connection con = connect.getConnection();
+        String sql = "insert into  Class (NameClass,CourseID) values (?,?)";
+        
+        PreparedStatement prepareState;
+        
+        try{
+            prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setString(1, classStudy.getName());
+            prepareState.setInt(2, classStudy.getCourseId());
+            prepareState.executeUpdate();
+            return true;
+            
+         } catch (Exception e) {
+             e.printStackTrace();
+             return false;
+         }   finally {
+            con.close();
+         }
+    }
+    
+    public boolean updateClass(ClassStudy classStudy) throws SQLException{
+        Connection con = connect.getConnection();
+        String sql = "update Class set NameClass = ?,CourseID = ? where ID = ?";
+        
+        PreparedStatement prepareState;
+        
+        try{
+            prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setString(1, classStudy.getName());
+            prepareState.setInt(2, classStudy.getCourseId());
+            prepareState.setInt(3, classStudy.getId());
+            prepareState.executeUpdate();
+            return true;
+            
+         } catch (Exception e) {
+             e.printStackTrace();
+             return false;
+         }   finally {
+            con.close();
+         }
+    }
+    
+    public boolean deleteClass(int strId) throws SQLException{
+        Connection con = connect.getConnection();
+        String sql = "delete from Class where ID = ?";
+        
+        PreparedStatement prepareState;
+        
+        try{
+            prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setInt(1, strId);
+            prepareState.executeUpdate();
+            return true;
+            
+         } catch (Exception e) {
+             e.printStackTrace();
+             return false;
+         }   finally {
+            con.close();
+         }
     }
 }

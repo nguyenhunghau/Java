@@ -10,6 +10,7 @@ import DTO.Semester;
 import com.mysql.jdbc.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class SemesterDao {
     /**
      * Get semester with Course ID
      */
-    public List getListSemester(String courseId){
+    public List getListSemester(String courseId) throws SQLException{
         
         List<Semester> listSemester = new ArrayList<Semester>();
         //Get connection with mysql server
@@ -46,12 +47,13 @@ public class SemesterDao {
                listSemester.add(semester);
             }
             
-            con.close();
             return listSemester;
             
         } catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        }  finally {
+            con.close();
         }
     }
 }

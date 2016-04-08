@@ -41,15 +41,13 @@
                                 </div>
                                 <div class="col-sm-6 col-md-6 col-lg-2 ">
                                     <div class="dropdown ten_ng_dung">
-                                        <a href="">
-                                            <img src="../../img/icon_login.gif" />Login
-                                        </a>
+                                        
                                     </div>
                                 </div>
                                 <div class="col-sm-3 col-md-3 col-lg-2">
                                     <div class="dropdown ten_ng_dung">
                                         <a href="">
-                                            <img src="../../img/icon_login.gif" />Register
+                                            <img src="../../img/icon_login.gif" />Login
                                         </a>
                                     </div>
                                 </div><!--kt nguoi dung-->

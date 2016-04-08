@@ -105,7 +105,7 @@
                                                             Address
                                                         </td>
                                                         <td class="headertable">
-                                                           Update
+                                                           Edit
                                                         </td >
                                                         <td class="headertable">
                                                             Delete
@@ -122,10 +122,10 @@
                                                                 int no = i + 1;
                                                     %>
                                                             <tr>
-                                                                <td>
+                                                                <td align = "center">
                                                                     <%= no%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "center">
                                                                     <%= listStudent.get(i).getId() %>
                                                                 </td>
                                                                 <td>
@@ -140,14 +140,14 @@
                                                                 <td>
                                                                     <%= listStudent.get(i).getAddress()%>
                                                                 </td>
-                                                                 <td>
-                                                                     <a href=<%= "updatestudent.jsp?ID=" + listStudent.get(i).getId() %>><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
+                                                                 <td align = "center">
+                                                                     <a href= "<%= "updatestudent.jsp?ID=" + listStudent.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
                                                                 </td>
-                                                                <td>
-                                                                    <a href=<%= "scoremanager.jsp?ID=" + listStudent.get(i).getId() %>><img src="../../img/images/delete.png" class = "img-edit" title ="Delete"/></a>
+                                                                <td align = "center">
+                                                                    <a href= "<%= "scoremanager.jsp?ID=" + listStudent.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
                                                                 </td>
-                                                                <td>
-                                                                    <a href= <%= "scoremanager.jsp?StudentId=" + listStudent.get(i).getId() %> ><img src="../../img/score.png" class = "img-edit" title="View score" alt=""/></a>
+                                                                <td align = "center">
+                                                                    <a href= "<%= "scoremanager.jsp?StudentId=" + listStudent.get(i).getId() %>" ><img src="../../img/score.png" class = "img-edit" title="View score" alt=""/></a>
                                                                 
                                                                 </td>
                                                             </tr>   

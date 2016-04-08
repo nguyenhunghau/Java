@@ -19,6 +19,7 @@ public class Student {
     private String strGender ; 
     private String strAddress; 
     private Date receiveDay ; 
+    private int classId;
 
     /**
      * @return the strId
@@ -102,6 +103,20 @@ public class Student {
      */
     public void setReceiveDay(Date receiveDay) {
         this.receiveDay = receiveDay;
+    }
+
+    /**
+     * @return the classId
+     */
+    public int getClassId() {
+        return classId;
+    }
+
+    /**
+     * @param classId the classId to set
+     */
+    public void setClassId(int classId) {
+        this.classId = classId;
     }
 
 }

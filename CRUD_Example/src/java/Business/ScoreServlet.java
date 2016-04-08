@@ -82,25 +82,24 @@ public class ScoreServlet extends HttpServlet {
         ScoreDao scoreDao = new ScoreDao();
         Score score= new Score();
         HttpSession sessions = request.getSession();
-        String path = request.getServletPath();
-        String url = "/CRUD_Example/faces/View/Content/scoremanager.jsp";
-        String studentId = (String)sessions.getAttribute("student");
-        String semesterId = (String)sessions.getAttribute("semesterid");
-        if(semesterId == null)
-            semesterId = "1";
+        String strPath = request.getServletPath();
+        String strUrl = "/CRUD_Example/faces/View/Content/scoremanager.jsp";
+        String strId = request.getParameter("ID");
+        String strSemesterId = request.getParameter("SemesterId");
+        String strStudentId = request.getParameter("StudentId");
         String message = "";
         
         try {
             
-            switch(path){
+            switch(strPath){
                 case "/getListScore":
-                    url += "?SemesterId=" + semesterId ;
+                    strUrl += "?SemesterId=" + strSemesterId ;
                     //Get score of student in database
-                    List<Score> listScore = scoreDao.getListScore(studentId, semesterId);
+                    List<Score> listScore = scoreDao.getListScore(strStudentId, strSemesterId);
                     sessions.setAttribute("listScore", listScore);   
-                    sessions.setAttribute("semesterid", semesterId);
+                    //sessions.setAttribute("semesterid", semesterId);
                     break;
-                case "/addNewScore":
+                /**case "/addNewScore":
                     url += "?SemesterId=" + semesterId + "&&StudentId=" + studentId;
                     score.setStudentId(studentId);
                     score.setSemesterId(Integer.valueOf(semesterId));
@@ -112,11 +111,10 @@ public class ScoreServlet extends HttpServlet {
                     if(scoreDao.addNewScore(score))
                         message = "Add score sucessful";
                     else
-                        message = "Can not add score";
+                        message = "Can not add score";*/
                     
                 case "/updateScore":
-                    score.setStudentId(studentId);
-                    score.setSemesterId(Integer.valueOf(semesterId));
+                    score.setId(Integer.valueOf(strId));
                     score.setSubjectId(Integer.valueOf(request.getParameter("Subject")));
                     score.setScrore_1(Float.valueOf(request.getParameter("Score1")));
                     score.setScrore_2(Float.valueOf(request.getParameter("Score2")));
@@ -126,6 +124,11 @@ public class ScoreServlet extends HttpServlet {
                         message = "Update score sucessful";
                     else
                         message = "Can not update score";
+                    
+                    //Get studentid of student after update 
+                    strStudentId = scoreDao.getScore(strId).getStudentId();
+                    strUrl += "?StudentId=" + strStudentId;
+                    
                 default:
                     break;
             }
@@ -137,7 +140,7 @@ public class ScoreServlet extends HttpServlet {
         } finally{
              sessions.setAttribute("message", message);
             //Redirect to scoremanager.jsp
-            response.sendRedirect(url); 
+            response.sendRedirect(strUrl); 
         }
     }
 

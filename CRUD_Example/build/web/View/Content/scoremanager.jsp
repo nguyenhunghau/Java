@@ -41,12 +41,11 @@
             //delete score
             if(strAction != null){
                 if(strAction.equals("delete")){
-                String strId = request.getParameter("ID");
-                scoreDao.deleteScore(strId);
+                    String strId = request.getParameter("ID");
+                    strStudentId = scoreDao.getScore(strId).getStudentId();
+                    scoreDao.deleteScore(strId);
+                }
             }
-            }
-            
-            
             //Create session with current student
             sessions.setAttribute("student", strStudentId);
             if(strCourseId == null){
@@ -74,6 +73,7 @@
                                                 <form action = "../../getListScore " method="post">
                                                     <div class="form-group col-md-12">
                                                         <label class="col-md-12" ></label>
+                                                        <input type="hidden" name = "StudentId" value="<%= strStudentId %>"/>
                                                     </div>
                                                     <div class="form-group col-md-6">
                                                         <label class="col-md-3" >Course: </label>
@@ -153,7 +153,7 @@
                                                             Average
                                                         </td>
                                                         <td class="headertable">
-                                                           Update
+                                                           Edit
                                                         </td >
                                                         <td class="headertable">
                                                             Delete
@@ -168,35 +168,35 @@
                                                                 int no = i + 1;
                                                     %>
                                                             <tr>
-                                                                <td>
+                                                                <td align = "center">
                                                                     <%= no%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "center">
                                                                     <%= listScore.get(i).getStrNameSemester()%>
                                                                 </td>
                                                                 <td>
                                                                     <%= listScore.get(i).getNameSubject()%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "right">
                                                                     <%= listScore.get(i).getScrore_1()%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "right">
                                                                     <%= listScore.get(i).getScrore_2()%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "right">
                                                                    <%= listScore.get(i).getScrore_3()%>
                                                                 </td>
-                                                                <td>
+                                                                <td align = "right">
                                                                     <%= listScore.get(i).getAverage()%>
                                                                 </td>
-                                                                 <td>
-                                                                     <a href=<%= "updatescore.jsp?ID=" + listScore.get(i).getId() %> >
+                                                                 <td align = "center">
+                                                                     <a href="<%= "updatescore.jsp?ID=" + listScore.get(i).getId() %>" >
                                                                          <img src="../../img/images/Edit.png" class = "img-edit" alt=""/>
                                                                      </a>
                                                                 </td>
-                                                                <td>
-                                                                     <a href=<%= "scoremanager.jsp?act=delete&&ID=" + listScore.get(i).getId()%>>
-                                                                         <img src="../../img/images/delete.png" class = "img-edit" alt=""/>
+                                                                <td align = "center">
+                                                                     <a href="<%= "scoremanager.jsp?act=delete&&ID=" + listScore.get(i).getId()%>" >
+                                                                         <img src="../../img/images/delete.png" class = "img-edit" alt="" onclick="return confirm('Are you sure?')"/>
                                                                      </a>
                                                                 </td>
                                                             </tr>   
@@ -214,16 +214,19 @@
                         </div>
             </div>
         </div><!--kt_content right-->
-       <script type="text/javascript">
-      // bind change event to select
-       $('#course').bind('change', function () {
-          var url = this.value; // get selected value
-          if (url!== '') { // require a URL
-              window.location = 'scoremanager.jsp?courseid=' + url; // redirect
-          }
-          return false;
-      });
-</script>
+            </div>
+        </div>
+        <script type="text/javascript">
+            // bind change event to select
+             $('#course').bind('change', function () {
+                var url = this.value; // get selected value
+                if (url!== '') { // require a URL
+                    window.location = 'scoremanager.jsp?courseid=' + url; // redirect
+                }
+                return false;
+            });
+        </script>
+    
     </body>
 </html
 

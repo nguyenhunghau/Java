@@ -95,6 +95,15 @@
 .list-student{
     padding: 40px;
 }
+
+.div-login
+{
+    padding: 40px;
+    width: 60%;
+    background-color: #DCDCDC;
+    margin: 40px 40px 40px 200px;
+    border-radius:5px;
+}
  
 .div-submit-index{
     margin-left: 40%;

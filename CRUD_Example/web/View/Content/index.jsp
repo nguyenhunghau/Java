@@ -30,6 +30,11 @@
                             <div class = "subframe">
                                 <img src="../../img/banner2.gif" class = "img_subframe"/>
                                 <br/>
+                                
+<form name =" myform" onsubmit="return myFunction();" action = "../../addNewStudent" method="post"  />
+  Enter name: <input type="text" name="fname">
+  <input type="submit" value="Submit">
+</form>
                                 <h3 class="text-subframe"></h3>    
                             </div>
                         </div>
@@ -38,5 +43,7 @@
             </div>
         </div><!--kt_content right-->
         <jsp:include page = "../Share/footer.jsp"></jsp:include>
+        
+</script>
     </body>
 </html>

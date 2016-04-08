@@ -48,6 +48,8 @@
                                                     
                                                     <div class="row">
                                                         <div class="form-group col-md-12">
+                                                            <input type="hidden" class = "form-control" name = "ID" value="<%= strId %>"/>
+                                                            
                                                             <label class="col-md-3" >Subject </label>
                                                             <div class="col-md-9">
                                                                 <select class = "form-control" name = "Subject">

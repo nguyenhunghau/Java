@@ -30,7 +30,7 @@ public class StudentDao {
     /**
      * Get all students in database by ID and Name
      */
-    public List getListStudent(String Id, String Name){
+    public List getListStudent(String Id, String Name) throws SQLException{
         
         List<Student> listStudent = new ArrayList<Student>();
         //Get connection with mysql server
@@ -55,20 +55,21 @@ public class StudentDao {
                student.setGender(rs.getString("Gender"));
                student.setName(rs.getString("NameStudent"));
                student.setReceiveDay(rs.getDate("ReceiveDay"));
-               
+               student.setClassId(rs.getInt("ClassID"));
                listStudent.add(student);
             }
             
-            con.close();
             return listStudent;
         }
         catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        }  finally {
+            con.close();
         }
     }
     
-    public Student getStudent(String Id){
+    public Student getStudent(String Id) throws SQLException{
         //Get connection with mysql server
         Connection con = connect.getConnection();
         String sql = "select * from Student where ID = ? "; 
@@ -87,25 +88,26 @@ public class StudentDao {
                student.setGender(rs.getString("Gender"));
                student.setName(rs.getString("NameStudent"));
                student.setReceiveDay(rs.getDate("ReceiveDay"));
+                student.setClassId(rs.getInt("ClassID"));
             }
             
-            con.close();
             return student;
         }
         catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        }  finally {
+            con.close();
         }
     }
     
     public boolean addNewStudent(Student student) throws SQLException{
         Connection con = connect.getConnection();
-        String sql = "insert into Student(ID,NameStudent,Birthday,Gender,Address,ReceiveDay) values (?,?,?,?,?,?)";
+        String sql = "insert into Student(ID,NameStudent,Birthday,Gender,Address,ReceiveDay,ClassID) values (?,?,?,?,?,?,?)";
         
         PreparedStatement prepareState;
         
         try{
-            
             prepareState = (PreparedStatement) con.prepareStatement(sql);
             prepareState.setString(1, student.getId());
             prepareState.setString(2, student.getName());
@@ -113,46 +115,45 @@ public class StudentDao {
             prepareState.setString(4, student.getGender());
             prepareState.setString(5, student.getAddress());
             prepareState.setDate(6, student.getReceiveDay());
-            
+            prepareState.setInt(7, student.getClassId());
             prepareState.executeUpdate();
-            con.close();
             return true;
             
          } catch (Exception e) {
              e.printStackTrace();
-             con.close();
              return false;
-         } 
+         }   finally {
+            con.close();
+         }
     }
     
     public boolean updateStudent(Student student) throws SQLException{
         Connection con = connect.getConnection();
         String sql = "update Student SET NameStudent = ? , Birthday = ? , Gender = ?,"
-                        + " Address= ? , ReceiveDay= ? where ID = ?";
+                        + " Address= ? , ReceiveDay= ?, ClassID = ? where ID = ?";
        
         PreparedStatement prepareState;
         
         try{
-            
             prepareState = (PreparedStatement) con.prepareStatement(sql);
             prepareState.setString(1, student.getName());
             prepareState.setDate(2, student.getBirthday());
             prepareState.setString(3, student.getGender());
             prepareState.setString(4, student.getAddress());
             prepareState.setDate(5, student.getReceiveDay());
-            prepareState.setString(6, student.getId());
+            prepareState.setInt(7, student.getClassId());
+            prepareState.setString(7, student.getId());
+            String path = prepareState.toString();
             prepareState.executeUpdate();
-            con.close();
             return true;
             
          } catch (Exception e) {
              e.printStackTrace();
-             con.close();
              return false;
          } 
     }
     
-    public boolean deleteStudent(String Id)
+    public boolean deleteStudent(String Id) throws SQLException
     {
         Connection con = connect.getConnection();
         String sql="DELETE FROM Student WHERE ID = ?";
@@ -162,11 +163,12 @@ public class StudentDao {
             prepareState=(PreparedStatement) con.prepareStatement(sql);
             prepareState.setString(1, Id);
             prepareState.executeUpdate();
-            con.close();
             return true;
         }
         catch(Exception ex){
             return false;
+        }  finally {
+            con.close();
         }
     } 
     /**

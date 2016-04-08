@@ -26,7 +26,7 @@ public class ScoreDao {
     /**
      * Get Score with StudentId and SemeterId
      */
-    public List getListScore(String studentId, String semesterId){
+    public List getListScore(String studentId, String semesterId) throws SQLException{
         
         List<Score> listScore = new ArrayList<Score>();
         //Get connection with mysql server
@@ -63,16 +63,17 @@ public class ScoreDao {
                listScore.add(score);
             }
             
-            con.close();
             return listScore;
             
         } catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        } finally {
+            con.close();
         }
     }
     
-    public Score getScore(String strId){
+    public Score getScore(String strId) throws SQLException{
         
         //Get connection with mysql server
         Connection con = connect.getConnection();
@@ -87,18 +88,20 @@ public class ScoreDao {
             ResultSet rs = prepareState.executeQuery();
             String s = prepareState.toString();
             while(rs.next()) {
+               score.setStudentId(rs.getString("StudentID"));
                score.setScrore_1(rs.getFloat("Score1"));
                score.setScrore_2(rs.getFloat("Score2"));
                score.setScrore_3(rs.getFloat("Score3"));
                score.setSubjectId(rs.getInt("SubjectID"));
             }
             
-            con.close();
             return score;
             
         } catch(Exception ex){
             System.err.println("Error Connect ");
             return null;
+        }  finally {
+            con.close();
         }
     }
     
@@ -106,7 +109,7 @@ public class ScoreDao {
         return (float) Math.round((score1 + score2*2 + score3* 3)/6 * 100) / 100;
     }
     
-    public boolean deleteScore(String Id)
+    public boolean deleteScore(String Id) throws SQLException
     {
         Connection con = connect.getConnection();
         String sql="DELETE FROM Score WHERE ID = ?";
@@ -116,15 +119,16 @@ public class ScoreDao {
             prepareState=(PreparedStatement) con.prepareStatement(sql);
             prepareState.setString(1, Id);
             prepareState.executeUpdate();
-            con.close();
             return true;
         }
         catch(Exception ex){
             return false;
+        }  finally {
+            con.close();
         }
     } 
     
-    public boolean addNewScore(Score score){
+    public boolean addNewScore(Score score) throws SQLException{
         Connection con = connect.getConnection();
         String sql = "insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values (?,?,?,?,?,?)";
         
@@ -140,19 +144,20 @@ public class ScoreDao {
             prepareState.setFloat(5, score.getScrore_2());
             prepareState.setFloat(6, score.getScrore_3());
             prepareState.executeUpdate();
-            con.close();
             return true;
             
          } catch (Exception e) {
              e.printStackTrace();
              return false;
-         } 
+         }  finally {
+            con.close();
+        }
     }
     
     public boolean updateScore(Score score) throws SQLException{
         Connection con = connect.getConnection();
-        String sql = "update Score SET SemesterID = ? , SubjectID = ?,Score1 = ?"
-                        + ", Score2 = ? , Score3 = ? where StudentID = ?";
+        String sql = "update Score SET SubjectID = ?,Score1 = ?"
+                        + ", Score2 = ? , Score3 = ? where ID = ?";
        
         PreparedStatement prepareState;
         
@@ -160,21 +165,20 @@ public class ScoreDao {
             
             prepareState = (PreparedStatement) con.prepareStatement(sql);
             
-            prepareState.setInt(1, score.getSemesterId());
-            prepareState.setInt(2, score.getSubjectId());
-            prepareState.setFloat(3, score.getScrore_1());
-            prepareState.setFloat(4, score.getScrore_2());
-            prepareState.setFloat(5, score.getScrore_3());
-            prepareState.setString(6, score.getStudentId());
+            prepareState.setInt(1, score.getSubjectId());
+            prepareState.setFloat(2, score.getScrore_1());
+            prepareState.setFloat(3, score.getScrore_2());
+            prepareState.setFloat(4, score.getScrore_3());
+            prepareState.setInt(5, score.getId());
             String s = prepareState.toString();
             prepareState.executeUpdate();
-            con.close();
             return true;
             
          } catch (Exception e) {
              e.printStackTrace();
-             con.close();
              return false;
-         } 
+         }  finally {
+            con.close();
+        }
     }
 }
