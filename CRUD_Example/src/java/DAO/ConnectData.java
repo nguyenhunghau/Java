@@ -19,15 +19,15 @@ import java.sql.SQLException;
 public class ConnectData {
     private Connection con;
     private Statement statement;
-    private static String connectionString = "jdbc:mysql://172.30.4.141:3306/STUDENT_MANAGER";
-    private String username = "root";
-    private String password = "hunghauit117";
+    private static String strConnectionString = "jdbc:mysql://127.0.0.1:3306/STUDENT_MANAGER";
+    private String strUsername = "root";
+    private String strPassword = "nguyenhunghau";
      
     public Connection getConnection(){
         
         try {
             Class.forName("com.mysql.jdbc.Driver");       
-            con = DriverManager.getConnection(connectionString,username,password);
+            con = DriverManager.getConnection(strConnectionString,strUsername,strPassword);
             System.out.print("Connect successful");
             return con;
         } catch (Exception ex) {

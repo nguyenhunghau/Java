@@ -3,6 +3,7 @@
     Created on : Apr 4, 2016, 2:10:30 PM
     Author     : root
 --%>
+<%@page import="DTO.User"%>
 <%@page import="DAO.StudentDao"%>
 <%@page import="java.util.AbstractList"%>
 <%@page import="java.util.List"%>
@@ -20,6 +21,11 @@
             List<Student> listStudent = null;
             HttpSession sessions = request.getSession();
             StudentDao studenDao = new StudentDao();
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             // Get id of student we want to delete
             String id = request.getParameter("ID");
             // Get type of action such as update, add new student...

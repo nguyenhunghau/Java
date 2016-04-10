@@ -66,6 +66,7 @@ create table User
 (
 	ID int not null auto_increment primary key,
 	TypeID int not null,
+    Username varchar(30),
 	Passwords varchar(100)
 );
 
@@ -109,4 +110,6 @@ insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values (
 insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values ('120002',1,2,6,7,8);
 insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values ('120002',1,3,6,7,8);
 insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values ('120002',1,4,6,7,8);
-insert into Score (StudentID,SemesterID,SubjectID,Score1,Score2,Score3) Values ('160003',1,1,6.0,9.0,3.0)
+
+insert into TypeUser (NameType) values ('Teacher');
+insert into User (TypeID,Username,Passwords) values (1,'teacher','e10adc3949ba59abbe56e057f20f883e')

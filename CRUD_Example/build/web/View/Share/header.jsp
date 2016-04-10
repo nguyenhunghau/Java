@@ -4,6 +4,7 @@
     Author     : root
 --%>
 
+<%@page import="DTO.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -14,10 +15,20 @@
         <link href="../../Css/index.css" rel="stylesheet" type="text/css"/>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="../../js/jquery.js"></script>
+        <link href="../../Css/main.css" rel="stylesheet" type="text/css"/>
         <script src="../../js/bootstrap.min.js"></script>
         <script src="../../js/bootstrap.js"></script>
     </head>
     <body>
+        <%
+            HttpSession sessions = request.getSession();
+            User user = (User)session.getAttribute("user");
+            String strLogin = "login";
+            if(user != null){
+                strLogin = user.getStrUsername();
+            }
+            
+        %>
         <div class="container">
         <!--header-->
             <div class="row th-header">
@@ -39,18 +50,17 @@
                                         <button type="submit" class="btn btn-default btn_search"><i>Search</i></button>
                                     </form>
                                 </div>
-                                <div class="col-sm-6 col-md-6 col-lg-2 ">
-                                    <div class="dropdown ten_ng_dung">
-                                        
-                                    </div>
-                                </div>
-                                <div class="col-sm-3 col-md-3 col-lg-2">
-                                    <div class="dropdown ten_ng_dung">
-                                        <a href="">
-                                            <img src="../../img/icon_login.gif" />Login
-                                        </a>
-                                    </div>
-                                </div><!--kt nguoi dung-->
+                               <%
+                                    if(user == null){
+                               %>
+                                        <jsp:include page = "../Share/beforelogin.jsp"></jsp:include>
+                                <%         
+                                    } else {
+                                %>
+                                         <jsp:include page = "../Share/loginsuccess.jsp"></jsp:include>
+                                <%
+                                    }
+                               %>
                             </div>
                         </div>
                     </div>

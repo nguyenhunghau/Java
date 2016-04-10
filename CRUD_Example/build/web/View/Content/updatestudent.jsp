@@ -4,6 +4,7 @@
     Author     : 12121_000
 --%>
 
+<%@page import="DTO.User"%>
 <%@page import="DTO.Course"%>
 <%@page import="DTO.ClassStudy"%>
 <%@page import="java.util.List"%>
@@ -18,18 +19,34 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Add new student</title>
-       
+        <title>Update student</title>
+       <script>
+            function myFunction(){ 
+            var name=document.getElementById('Name');
+            var birthday = document.getElementById('Birthday');
+            var address = document.getElementById('Address');
+            
+            if (name.value == "" || birthday.value == "" || address.value == ""){  
+              alert("Please fill all textbox");  
+              return false;  
+            }
+            }
+        </script>
     </head>
     <body>
         <jsp:include page = "../Share/header.jsp"></jsp:include>
         <%
             ClassStudyDao classDao = new ClassStudyDao();
+            HttpSession sessions = request.getSession();
             CourseDao courseDao = new CourseDao();
             String idStudent = request.getParameter("ID");
             StudentDao studentDao = new StudentDao();
             Student student = studentDao.getStudent(idStudent);
-           
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             String strCourseId = request.getParameter("courseid");
             
             if(strCourseId == null){
@@ -53,7 +70,7 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form action = "../../updateStudent" method="post" />
+                                                <form name =" myform" onsubmit="return myFunction();" action = "../../updateStudent" method="post" />
                                                     <div class="row">
                                                         <div class="form-group col-md-12">
                                                             <input type="hidden" class = "form-control" name = "ID"  value = "<%= idStudent %>" />
@@ -63,7 +80,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Name: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class = "form-control" name = "Name" placeholder ="Name" value = "<%=student.getName() %>" />
+                                                                <input type="text" class = "form-control" name = "Name" placeholder ="Name" value = "<%=student.getName() %>" id ="Name"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -71,7 +88,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Birthday: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" id ="birthday" class = "form-control datepicker" placeholder ="2016-09-15" name = "Birthday"  value = "<%=student.getBirthday()%>" />
+                                                                <input type="text" id ="birthday" class = "form-control datepicker" placeholder ="2016-09-15" name = "Birthday"  value = "<%=student.getBirthday()%>" id = "Birthday"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -96,7 +113,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Address: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class = "form-control" name = "Address" placeholder ="Address" value = "<%=student.getAddress()%>" />
+                                                                <input type="text" class = "form-control" name = "Address" placeholder ="Address" value = "<%=student.getAddress()%>" id = "Address"/>
                                                             </div>
                                                         </div>
                                                     </div> 

@@ -14,6 +14,8 @@
     <body>
           <jsp:include page = "../Share/header.jsp"></jsp:include>
         <% 
+            HttpSession sessions = request.getSession();
+            sessions.setAttribute("user", null);
             String strMessage = request.getParameter("error");
             if(strMessage != null)
                 strMessage = "Username or password is incorrect";
@@ -29,7 +31,7 @@
                             <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12 ">
                                     <div class="row">
-                                        <form action = "../../LoginServlet">
+                                        <form action = "../../LoginServlet" method="post">
                                             <div class="form-group col-md-12">
                                                 <label class="col-md-12" ><%= strMessage %></label>
                                             </div>

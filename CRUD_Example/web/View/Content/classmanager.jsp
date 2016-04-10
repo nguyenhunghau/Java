@@ -4,6 +4,7 @@
     Author     : root
 --%>
 
+<%@page import="DTO.User"%>
 <%@page import="DTO.ClassStudy"%>
 <%@page import="java.util.List"%>
 <%@page import="DAO.ClassStudyDao"%>
@@ -19,7 +20,11 @@
         <%
             ClassStudyDao classStudyDao = new ClassStudyDao();
             HttpSession sessions = request.getSession();
-            
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             //Check ID to delete
             String strId = request.getParameter("ID");
             if(strId != null){
@@ -102,7 +107,7 @@
                                             </div>
                                                 
                                                 <div class="row" style="margin-top:10px;margin-left: 20px;">
-                                                <a href="/CRUD_Example/faces/View/Content/newstudent.jsp">Create new student</a>
+                                                <a href="/CRUD_Example/faces/View/Content/newstudent.jsp">Create new class</a>
                                             </div>
                                         </div>
                                     </div>

@@ -204,3 +204,42 @@
     color:#FFF;
     font-size:18px;
 }
+
+ .frm_search{
+	height:27px;
+	border-radius:20px 0px 0px 20px;
+	background:url(../img/bg_nguyen_vlieu_03.gif);
+	box-shadow:#7BA4C1 0px 0px 10px 1px;
+	margin-right:-5px;
+}
+.btn_search{
+	height:23px;
+	border-radius:0px 0px 0px 0px;
+	border:none;
+	background:url(../img/bg_nvl_03.gif);
+	box-shadow:#7BA4C1 0px 0px 10px 1px;
+	margin-top:2px;
+	padding-bottom:20px;
+}
+
+
+.sidebar-nav {
+    padding: 9px 0;
+}
+ 
+.dropdown-menu .sub-menu {
+    left: 100%;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    margin-top: -1px;
+}
+ 
+.dropdown-menu li:hover .sub-menu {
+    visibility: visible;
+}
+ 
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+ 

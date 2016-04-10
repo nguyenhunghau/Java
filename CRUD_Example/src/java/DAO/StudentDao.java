@@ -141,9 +141,8 @@ public class StudentDao {
             prepareState.setString(3, student.getGender());
             prepareState.setString(4, student.getAddress());
             prepareState.setDate(5, student.getReceiveDay());
-            prepareState.setInt(7, student.getClassId());
+            prepareState.setInt(6, student.getClassId());
             prepareState.setString(7, student.getId());
-            String path = prepareState.toString();
             prepareState.executeUpdate();
             return true;
             

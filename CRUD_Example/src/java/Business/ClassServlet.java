@@ -97,7 +97,7 @@ public class ClassServlet extends HttpServlet {
                 case "/updateClass":
                     classStudy.setId(Integer.valueOf(strClassId));
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
-                    classStudy.setName(request.getParameter("NameClass"));
+                    classStudy.setName(request.getParameter("Name"));
                     if(classDao.updateClass(classStudy))
                         strMessage = "Update class successful";
                     else

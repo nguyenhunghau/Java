@@ -95,9 +95,12 @@ public class LoginServlet extends HttpServlet {
            if(user != null){
                //Create sessionlogin
                 sessions.setAttribute("user", user);
-                response.sendRedirect(strUrl);
+                if(sessions.getAttribute("url") != null)
+                    response.sendRedirect((String)sessions.getAttribute("url"));
+                else
+                    response.sendRedirect(strUrl);
            } else {
-               response.sendRedirect("/faces/View/Content/login.jsp?error=1");
+               response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp?error=1");
            }
         } catch(Exception e) {
             e.printStackTrace();

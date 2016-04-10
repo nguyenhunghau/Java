@@ -97,26 +97,11 @@ public class ScoreServlet extends HttpServlet {
             
             switch(strPath){
                 case "/getListScore":
-                    strUrl += "?SemesterId=" + strSemesterId ;
+                    strUrl += "?SemesterId=" + strSemesterId + "&&StudentId="+ strStudentId;
                     //Get score of student in database
                     List<Score> listScore = scoreDao.getListScore(strStudentId, strSemesterId);
-                    sessions.setAttribute("listScore", listScore);   
-                    //sessions.setAttribute("semesterid", semesterId);
+                    sessions.setAttribute("listScore", listScore); 
                     break;
-                /**case "/addNewScore":
-                    url += "?SemesterId=" + semesterId + "&&StudentId=" + studentId;
-                    score.setStudentId(studentId);
-                    score.setSemesterId(Integer.valueOf(semesterId));
-                    score.setSubjectId(Integer.valueOf(request.getParameter("Subject")));
-                    score.setScrore_1(Float.valueOf(request.getParameter("Score1")));
-                    score.setScrore_2(Float.valueOf(request.getParameter("Score2")));
-                    score.setScrore_3(Float.valueOf(request.getParameter("Score3")));
-                    
-                    if(scoreDao.addNewScore(score))
-                        message = "Add score sucessful";
-                    else
-                        message = "Can not add score";*/
-                    
                 case "/updateScore":
                     score.setId(Integer.valueOf(strId));
                     score.setSubjectId(Integer.valueOf(request.getParameter("Subject")));
@@ -132,7 +117,7 @@ public class ScoreServlet extends HttpServlet {
                     //Get studentid of student after update 
                     strStudentId = scoreDao.getScore(strId).getStudentId();
                     strUrl += "?StudentId=" + strStudentId;
-                    
+                     break;
                 default:
                     break;
             }

@@ -4,6 +4,7 @@
     Author     : root
 --%>
 
+<%@page import="DTO.User"%>
 <%@page import="DTO.Score"%>
 <%@page import="DAO.ScoreDao"%>
 <%@page import="DTO.Subject"%>
@@ -22,6 +23,11 @@
             SubjectDao subjectDao = new SubjectDao();
             ScoreDao scoreDao = new ScoreDao();
             HttpSession sessions = request.getSession();
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             String strId = request.getParameter("ID");
             Score score = scoreDao.getScore(strId);
             //Get list subject

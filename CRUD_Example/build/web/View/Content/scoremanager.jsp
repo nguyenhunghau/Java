@@ -1,5 +1,6 @@
 
 
+<%@page import="DTO.User"%>
 <%@page import="DAO.ScoreDao"%>
 <%@page import="DTO.Course"%>
 <%@page import="DAO.CourseDao"%>
@@ -28,6 +29,11 @@
             StudentDao studentDao = new StudentDao();
             ScoreDao scoreDao = new ScoreDao();
             HttpSession sessions = request.getSession();
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             List<Score> listScore = (List<Score>)sessions.getAttribute("listScore");
             //Get list Course
             List<Course> listCourse = courseDao.getListCourse();

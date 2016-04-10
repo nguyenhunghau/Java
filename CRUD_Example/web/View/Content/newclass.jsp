@@ -4,6 +4,7 @@
     Author     : root
 --%>
 
+<%@page import="DTO.User"%>
 <%@page import="DTO.Course"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.List"%>
@@ -14,13 +15,28 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>JSP Page</title>
+        <script>
+            function myFunction(){ 
+            var name=document.getElementById('Name');
+            
+            if (name.value == ""){  
+              alert("Please fill name of class");  
+              return false;  
+            }
+            }
+        </script>
     </head>
     <body>
         <jsp:include page = "../Share/header.jsp"></jsp:include>
         <% 
             CourseDao courseDao = new CourseDao();
             List<Course> listCourse = courseDao.getListCourse();
-            
+            HttpSession sessions = request.getSession();
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
         %>
         <div class="container div-content">
             <div class="row">

@@ -61,6 +61,37 @@ public class ClassStudyDao {
         }
     }
     
+    public ClassStudy getClass(String strClassId) throws SQLException{
+        
+        List<ClassStudy> listClass = new ArrayList<ClassStudy>();
+        ClassStudy classStudy = new ClassStudy();
+        //Get connection with mysql server
+        Connection con = connect.getConnection();
+        String sql = "select * from Class where ID = ?";
+        
+        PreparedStatement prepareState;
+        
+        try{
+            prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setString(1, strClassId);
+            ResultSet rs = prepareState.executeQuery();
+            
+            while(rs.next()) {
+               classStudy.setId(rs.getInt("ID"));
+               classStudy.setName(rs.getString("NameClass"));
+               classStudy.setCourseId(rs.getInt("CourseID"));
+            }
+            
+            return classStudy;
+        }
+        catch(Exception ex){
+            System.err.println("Error Connect ");
+            return null;
+        } finally {
+            con.close();
+        }
+    }
+    
     public boolean addNewClass(ClassStudy classStudy) throws SQLException{
         Connection con = connect.getConnection();
         String sql = "insert into  Class (NameClass,CourseID) values (?,?)";
