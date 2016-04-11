@@ -80,6 +80,8 @@ public class ScoreServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding("utf-8");
         
         ScoreDao scoreDao = new ScoreDao();
         Score score= new Score();

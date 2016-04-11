@@ -1,12 +1,12 @@
-Create database STUDENT_MANAGER;
+Create database STUDENT_MANAGER DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 create TABLE Student (
 
 	ID varchar(6) not null primary key,
-	NameStudent  nvarchar(50),
+	NameStudent  varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci ,
 	Birthday datetime,
-	Gender nvarchar(10) check (Gender in (Male, Female)),	
-	Address nvarchar(20),
+	Gender varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci ,	
+	Address varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci ,
 	ReceiveDay date,
     ClassId int
 );
@@ -14,7 +14,7 @@ create TABLE Student (
 create table Class 
 (
 	ID int not null auto_increment primary key,
-	NameClass nvarchar(20) ,
+	NameClass varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci ,
 	CourseID int
 );
 
@@ -28,7 +28,7 @@ create table Course
 create table Semester
 (
 	ID int not null auto_increment primary key,
-    NameSemester varchar(20) ,
+    NameSemester varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci  ,
 	CourseID int,
 	MonthBegin int,
 	MonthEnd int
@@ -37,7 +37,7 @@ create table Semester
 create table Subject 
 (
 	ID int not null auto_increment primary key,
-	NameSubject nvarchar(50)
+	NameSubject varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci 
 );
 
 create table Score
@@ -66,14 +66,14 @@ create table User
 (
 	ID int not null auto_increment primary key,
 	TypeID int not null,
-    Username varchar(30),
-	Passwords varchar(100)
+    Username varchar(30) CHARACTER SET utf8 COLLATE utf8_general_ci ,
+	Passwords varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci 
 );
 
 create table TypeUser
 (
 	ID int not null auto_increment primary key,
-	NameType nvarchar(20)
+	NameType varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci 
 );
 
 /* foreign key */

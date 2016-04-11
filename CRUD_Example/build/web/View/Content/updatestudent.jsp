@@ -22,14 +22,53 @@
         <title>Update student</title>
        <script>
             function myFunction(){ 
-            var name=document.getElementById('Name');
-            var birthday = document.getElementById('Birthday');
-            var address = document.getElementById('Address');
-            
-            if (name.value == "" || birthday.value == "" || address.value == ""){  
-              alert("Please fill all textbox");  
-              return false;  
+                var name=document.getElementById('Name');
+                var birthday = document.getElementById('Birthday');
+                  
+                var address = document.getElementById('Address');
+                var classId = document.getElementById('ClassId');
+                if (name.value == "" || birthday.value == "" || address.value == "" || classId.value == ""){  
+                  alert("Please fill all information");  
+                  return false;  
+                }
+                if(!isValidDate(birthday.value)){
+                    alert("Birthday is incorrect with format datetime");
+                    return false;  
+                }
             }
+            
+            function isValidDate(dateString)
+            {
+                // First check for the pattern
+                var regex_date = /^\d{4}\-\d{1,2}\-\d{1,2}$/;
+
+                if(!regex_date.test(dateString))
+                {
+                    return false;
+                }
+
+                // Parse the date parts to integers
+                var parts   = dateString.split("-");
+                var day     = parseInt(parts[2], 10);
+                var month   = parseInt(parts[1], 10);
+                var year    = parseInt(parts[0], 10);
+
+                // Check the ranges of month and year
+                if(year < 1000 || year > 3000 || month == 0 || month > 12)
+                {
+                    return false;
+                }
+
+                var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+                // Adjust for leap years
+                if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+                {
+                    monthLength[1] = 29;
+                }
+
+                // Check the range of the day
+                return day > 0 && day <= monthLength[month - 1];
             }
         </script>
     </head>
@@ -73,7 +112,7 @@
                                                 <form name =" myform" onsubmit="return myFunction();" action = "../../updateStudent" method="post" />
                                                     <div class="row">
                                                         <div class="form-group col-md-12">
-                                                            <input type="hidden" class = "form-control" name = "ID"  value = "<%= idStudent %>" />
+                                                            <input type="hidden" class = "form-control" name = "ID"  value = "<%= idStudent %>" id = "ID"/>
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -88,7 +127,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Birthday: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" id ="birthday" class = "form-control datepicker" placeholder ="2016-09-15" name = "Birthday"  value = "<%=student.getBirthday()%>" id = "Birthday"/>
+                                                                <input type="text" class = "form-control datepicker" placeholder ="2016-09-15" name = "Birthday"  value = "<%=student.getBirthday()%>" id = "Birthday"/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -150,10 +189,10 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Class: </label>
                                                             <div class="col-md-9">
-                                                                <select class = "form-control" name = "ClassId">
+                                                                <select class = "form-control" name = "ClassId" id = "ClassId">
                                                                     <%
                                                                        for(int i = 0; i < listClass.size(); i++){ 
-                                                                            if(listClass.get(i).equals(student.getClassId())){
+                                                                            if(listClass.get(i).getId() == student.getClassId()){
                                                                     %>
 
                                                                        <option value = "<%=listClass.get(i).getId() %>" selected = "selected"><%=listClass.get(i).getName()%></option>
@@ -188,9 +227,10 @@
        <script type="text/javascript">
             // bind change event to select
              $('#course').bind('change', function () {
+                var id = document.getElementById('ID').value;
                 var url = this.value; // get selected value
                 if (url!== '') { // require a URL
-                    window.location = 'newstudent.jsp?courseid=' + url; // redirect
+                    window.location = 'updatestudent.jsp?ID=' + id + '&&courseid=' + url; // redirect
                 }
                 return false;
             });

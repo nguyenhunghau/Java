@@ -32,13 +32,18 @@ public class ClassStudyDao {
         List<ClassStudy> listClass = new ArrayList<ClassStudy>();
         //Get connection with mysql server
         Connection con = connect.getConnection();
-        String sql = "select * from Class where CourseID = ?";
+        String sql = "";
+        if(strCourseId.equals(""))
+            sql = "select * from Class";
+        else
+            sql = "select * from Class where CourseID = ?";
         
         PreparedStatement prepareState;
         
         try{
             prepareState = (PreparedStatement) con.prepareStatement(sql);
-            prepareState.setString(1, strCourseId);
+            if(!strCourseId.equals(""))
+                prepareState.setString(1, strCourseId);
             ResultSet rs = prepareState.executeQuery();
             
             while(rs.next()) {
@@ -94,6 +99,7 @@ public class ClassStudyDao {
     
     public boolean addNewClass(ClassStudy classStudy) throws SQLException{
         Connection con = connect.getConnection();
+        String strInit = "SET NAMES utf8";
         String sql = "insert into  Class (NameClass,CourseID) values (?,?)";
         
         PreparedStatement prepareState;
@@ -115,7 +121,7 @@ public class ClassStudyDao {
     
     public boolean updateClass(ClassStudy classStudy) throws SQLException{
         Connection con = connect.getConnection();
-        String sql = "update Class set NameClass = ?,CourseID = ? where ID = ?";
+        String sql = "update Class set NameClass  = ?,CourseID = ? where ID = ?";
         
         PreparedStatement prepareState;
         

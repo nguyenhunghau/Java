@@ -74,6 +74,7 @@ public class StudentServlet extends HttpServlet {
         
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
+        
         HttpSession session = request.getSession();
          if(session.getAttribute("user") == null)
             response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
@@ -92,6 +93,9 @@ public class StudentServlet extends HttpServlet {
         String path = request.getServletPath();
         //Get student id when update
         String strStudentId = request.getParameter("ID");
+        String strName = new String(request.getParameter("Name").getBytes("iso-8859-1"), "UTF-8");
+        String strAddress =  new String(request.getParameter("Address").getBytes("iso-8859-1"), "UTF-8");
+        
         //Format time for mysql
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         java.util.Date receive = Calendar.getInstance().getTime();
@@ -112,11 +116,11 @@ public class StudentServlet extends HttpServlet {
                 case "/updateStudent":
                     // Get data from inputs in form in file newstudent.jsp
                     student.setId(request.getParameter("ID"));
-                    student.setAddress(request.getParameter("Address"));
+                    student.setAddress(strAddress);
                     date = format.parse(request.getParameter("Birthday")); 
                     student.setBirthday(new Date(date.getTime()));
                     student.setGender(request.getParameter("Gender"));
-                    student.setName(request.getParameter("Name"));
+                    student.setName(strName);
                     student.setReceiveDay(new Date(receive.getTime()));
                     student.setClassId(Integer.valueOf(request.getParameter("ClassId")));
                     //uppdate student into database
@@ -129,11 +133,11 @@ public class StudentServlet extends HttpServlet {
                     
                 case "/addNewStudent":
                     student.setId(studentDao.createId());
-                    student.setAddress(request.getParameter("Address"));
+                    student.setAddress(strName);
                     date = format.parse(request.getParameter("Birthday")); 
                     student.setBirthday(new Date(date.getTime()));
                     student.setGender(request.getParameter("Gender"));
-                    student.setName(request.getParameter("Name"));
+                    student.setName(strName);
                     student.setReceiveDay(new Date(receive.getTime()));
                     student.setClassId(Integer.valueOf(request.getParameter("ClassId")));
                     //insert student into database

@@ -17,6 +17,18 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Update score</title>
+        <script>
+            function validate(evt) {
+                var theEvent = evt || window.event;
+                var key = theEvent.keyCode || theEvent.which;
+                key = String.fromCharCode( key );
+                var regex = /[0-9]|\./;
+                if( !regex.test(key) ) {
+                  theEvent.returnValue = false;
+                  if(theEvent.preventDefault) theEvent.preventDefault();
+                }
+              }
+        </script>
     </head>
        <body>
         <%
@@ -84,7 +96,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Score 1: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class = "form-control" placeholder ="Score 1" name = "Score1" value="<%= score.getScrore_1()%>"/>
+                                                                <input type="text" class = "form-control" placeholder ="Score 1" name = "Score1" value="<%= score.getScrore_1()%>" onkeypress='validate(event)'/>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -92,7 +104,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Score 2: </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class = "form-control" placeholder = "Score 2" name = "Score2" value="<%= score.getScrore_2()%>"/>
+                                                                <input type="text" class = "form-control" placeholder = "Score 2" name = "Score2" value="<%= score.getScrore_2()%>" onkeypress='validate(event)'/>
                                                              </div>
                                                         </div>
                                                     </div> 
@@ -100,7 +112,7 @@
                                                         <div class="form-group col-md-12">
                                                             <label class="col-md-3" >Score 3 </label>
                                                             <div class="col-md-9">
-                                                                <input type="text" class = "form-control" placeholder = "Score 3" name = "Score3" value="<%= score.getScrore_3()%>"/>
+                                                                <input type="text" class = "form-control" placeholder = "Score 3" name = "Score3" value="<%= score.getScrore_3()%>" onkeypress='validate(event)'/>
                                                             </div>
                                                         </div>
                                                     </div> 

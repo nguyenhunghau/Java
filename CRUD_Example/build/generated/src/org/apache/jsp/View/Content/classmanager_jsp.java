@@ -3,6 +3,7 @@ package org.apache.jsp.View.Content;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
+import DTO.User;
 import DTO.ClassStudy;
 import java.util.List;
 import DAO.ClassStudyDao;
@@ -50,6 +51,7 @@ public final class classmanager_jsp extends org.apache.jasper.runtime.HttpJspBas
       out.write("\n");
       out.write("\n");
       out.write("\n");
+      out.write("\n");
       out.write("<!DOCTYPE html>\n");
       out.write("<html>\n");
       out.write("    <head>\n");
@@ -64,13 +66,21 @@ public final class classmanager_jsp extends org.apache.jasper.runtime.HttpJspBas
 
             ClassStudyDao classStudyDao = new ClassStudyDao();
             HttpSession sessions = request.getSession();
-            List<ClassStudy> listClass = classStudyDao.getListClass("1");
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             //Check ID to delete
             String strId = request.getParameter("ID");
             if(strId != null){
                 classStudyDao.deleteClass(Integer.valueOf(strId));
             }
+            List<ClassStudy> listClass = classStudyDao.getListClass("");
             String strMessage = (String)sessions.getAttribute("message");
+            if(strMessage == null){
+                strMessage = "";
+            }
         
       out.write("\n");
       out.write("        <div class=\"container div-content\">\n");
@@ -162,7 +172,7 @@ public final class classmanager_jsp extends org.apache.jasper.runtime.HttpJspBas
       out.write("                                            </div>\n");
       out.write("                                                \n");
       out.write("                                                <div class=\"row\" style=\"margin-top:10px;margin-left: 20px;\">\n");
-      out.write("                                                <a href=\"/CRUD_Example/faces/View/Content/newstudent.jsp\">Create new student</a>\n");
+      out.write("                                                <a href=\"/CRUD_Example/faces/View/Content/newclass.jsp\">Create new class</a>\n");
       out.write("                                            </div>\n");
       out.write("                                        </div>\n");
       out.write("                                    </div>\n");

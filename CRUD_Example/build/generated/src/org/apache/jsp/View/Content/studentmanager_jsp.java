@@ -3,6 +3,9 @@ package org.apache.jsp.View.Content;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.jsp.*;
+import DTO.Score;
+import DAO.ScoreDao;
+import DTO.User;
 import DAO.StudentDao;
 import java.util.AbstractList;
 import java.util.List;
@@ -51,6 +54,9 @@ public final class studentmanager_jsp extends org.apache.jasper.runtime.HttpJspB
       out.write("\n");
       out.write("\n");
       out.write("\n");
+      out.write("\n");
+      out.write("\n");
+      out.write("\n");
       out.write("<!DOCTYPE html>\n");
       out.write("<html>\n");
       out.write("    <head>\n");
@@ -66,17 +72,29 @@ public final class studentmanager_jsp extends org.apache.jasper.runtime.HttpJspB
             List<Student> listStudent = null;
             HttpSession sessions = request.getSession();
             StudentDao studenDao = new StudentDao();
+            ScoreDao scoreDao = new ScoreDao();
+            User user = (User)session.getAttribute("user");
+            if(user == null){
+                sessions.setAttribute("url", request.getRequestURI());
+                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            }
             // Get id of student we want to delete
-            String id = request.getParameter("ID");
+            String strId = request.getParameter("ID");
             // Get type of action such as update, add new student...
-            String type = request.getParameter("type");
+            String strType = request.getParameter("type");
             
-            if(id != null){
-                studenDao.deleteStudent(id);
+            if(strId != null){
+                //Delete all score of this student
+                List<Score> listscore = scoreDao.getListScore(strId, "");
+                for(Score score:listscore){
+                    scoreDao.deleteScore(String.valueOf(score.getId()));
+                }
+                //Delete student
+                studenDao.deleteStudent(strId);
             }
              
             // If the first pageload or then add new student or then update, get all student
-            if(type == null || type.equals("update") || type.equals("addnew")){
+            if(strType == null || strType.equals("update") || strType.equals("addnew")){
                 listStudent = studenDao.getListStudent("", "");
             } else {
                 listStudent = (List<Student>)sessions.getAttribute("listStudent");
@@ -214,7 +232,7 @@ public final class studentmanager_jsp extends org.apache.jasper.runtime.HttpJspB
       out.write("                                                                </td>\n");
       out.write("                                                                <td align = \"center\">\n");
       out.write("                                                                    <a href= \"");
-      out.print( "scoremanager.jsp?ID=" + listStudent.get(i).getId() );
+      out.print( "studentmanager.jsp?ID=" + listStudent.get(i).getId() );
       out.write("\"><img src=\"../../img/images/delete.png\" class = \"img-edit\" title =\"Delete\" onclick=\"return confirm('Are you sure?')\"/></a>\n");
       out.write("                                                                </td>\n");
       out.write("                                                                <td align = \"center\">\n");

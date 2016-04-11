@@ -30,7 +30,7 @@
             if(strId != null){
                 classStudyDao.deleteClass(Integer.valueOf(strId));
             }
-            List<ClassStudy> listClass = classStudyDao.getListClass("1");
+            List<ClassStudy> listClass = classStudyDao.getListClass("");
             String strMessage = (String)sessions.getAttribute("message");
             if(strMessage == null){
                 strMessage = "";
@@ -107,7 +107,7 @@
                                             </div>
                                                 
                                                 <div class="row" style="margin-top:10px;margin-left: 20px;">
-                                                <a href="/CRUD_Example/faces/View/Content/newstudent.jsp">Create new class</a>
+                                                <a href="/CRUD_Example/faces/View/Content/newclass.jsp">Create new class</a>
                                             </div>
                                         </div>
                                     </div>

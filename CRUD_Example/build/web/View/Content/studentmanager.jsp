@@ -3,6 +3,8 @@
     Created on : Apr 4, 2016, 2:10:30 PM
     Author     : root
 --%>
+<%@page import="DTO.Score"%>
+<%@page import="DAO.ScoreDao"%>
 <%@page import="DTO.User"%>
 <%@page import="DAO.StudentDao"%>
 <%@page import="java.util.AbstractList"%>
@@ -21,22 +23,29 @@
             List<Student> listStudent = null;
             HttpSession sessions = request.getSession();
             StudentDao studenDao = new StudentDao();
+            ScoreDao scoreDao = new ScoreDao();
             User user = (User)session.getAttribute("user");
             if(user == null){
                 sessions.setAttribute("url", request.getRequestURI());
                 response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
             }
             // Get id of student we want to delete
-            String id = request.getParameter("ID");
+            String strId = request.getParameter("ID");
             // Get type of action such as update, add new student...
-            String type = request.getParameter("type");
+            String strType = request.getParameter("type");
             
-            if(id != null){
-                studenDao.deleteStudent(id);
+            if(strId != null){
+                //Delete all score of this student
+                List<Score> listscore = scoreDao.getListScore(strId, "");
+                for(Score score:listscore){
+                    scoreDao.deleteScore(String.valueOf(score.getId()));
+                }
+                //Delete student
+                studenDao.deleteStudent(strId);
             }
              
             // If the first pageload or then add new student or then update, get all student
-            if(type == null || type.equals("update") || type.equals("addnew")){
+            if(strType == null || strType.equals("update") || strType.equals("addnew")){
                 listStudent = studenDao.getListStudent("", "");
             } else {
                 listStudent = (List<Student>)sessions.getAttribute("listStudent");
@@ -150,7 +159,7 @@
                                                                      <a href= "<%= "updatestudent.jsp?ID=" + listStudent.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
                                                                 </td>
                                                                 <td align = "center">
-                                                                    <a href= "<%= "scoremanager.jsp?ID=" + listStudent.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
+                                                                    <a href= "<%= "studentmanager.jsp?ID=" + listStudent.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
                                                                 </td>
                                                                 <td align = "center">
                                                                     <a href= "<%= "scoremanager.jsp?StudentId=" + listStudent.get(i).getId() %>" ><img src="../../img/score.png" class = "img-edit" title="View score" alt=""/></a>

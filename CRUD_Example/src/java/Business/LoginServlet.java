@@ -86,8 +86,8 @@ public class LoginServlet extends HttpServlet {
         UserDao userDao = new UserDao();
         User user = new User();
         HttpSession sessions = request.getSession();
-        String strUsername = request.getParameter("Username");
-        String strPassword = request.getParameter("Password");
+        String strUsername =  new String(request.getParameter("Username").getBytes("iso-8859-1"), "UTF-8");
+        String strPassword =  new String(request.getParameter("Password").getBytes("iso-8859-1"), "UTF-8");
         String strUrl = "/CRUD_Example/faces/View/Content/studentmanager.jsp";
         
         try {

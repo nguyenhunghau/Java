@@ -9,7 +9,18 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Login</title>
+        <script>
+            function myFunction(){ 
+                var username = document.getElementById('Username');
+                var password = document.getElementById('Password');
+
+                if (username.value == "" || password.value == "" ){  
+                  alert("Please fill all information");  
+                  return false;  
+                }
+            }
+        </script>
     </head>
     <body>
           <jsp:include page = "../Share/header.jsp"></jsp:include>
@@ -31,20 +42,20 @@
                             <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12 ">
                                     <div class="row">
-                                        <form action = "../../LoginServlet" method="post">
+                                        <form name =" myform" onsubmit="return myFunction();" action = "../../LoginServlet" method="post">
                                             <div class="form-group col-md-12">
                                                 <label class="col-md-12" ><%= strMessage %></label>
                                             </div>
                                             <div class="form-group col-md-12">
                                                 <label class="col-md-3" >Username: </label>
                                                 <div class="col-md-9">
-                                                    <input type="text" class = "form-control" name = "Username"/>
+                                                    <input type="text" class = "form-control" name = "Username" id = "Username"/>
                                                 </div>
                                             </div>
                                             <div class="form-group col-md-12">
                                                 <label class="col-md-3" >Password: </label>
                                                 <div class="col-md-9">
-                                                    <input type="password" class = "form-control" name = "Password"/>
+                                                    <input type="password" class = "form-control" name = "Password" id = "Password"/>
                                                 </div>
                                             </div>
                                              <div>

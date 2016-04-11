@@ -9,6 +9,7 @@ import DAO.ClassStudyDao;
 import DTO.ClassStudy;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -60,6 +61,8 @@ public class ClassServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        response.setContentType("text/html;charset=UTF-8");
+         response.setCharacterEncoding("UTF-8");
     }
 
     /**
@@ -73,7 +76,10 @@ public class ClassServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("utf-8");
+        response.setCharacterEncoding("UTF-8");
         
+        String strNameClass =  new String(request.getParameter("Name").getBytes("iso-8859-1"), "UTF-8");
         String path = request.getServletPath();
         HttpSession sessions = request.getSession();
         if(sessions.getAttribute("user") == null)
@@ -88,7 +94,7 @@ public class ClassServlet extends HttpServlet {
             switch(path){
                 case "/addClass":
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
-                    classStudy.setName(request.getParameter("Name"));
+                    classStudy.setName(strNameClass);
                     if(classDao.addNewClass(classStudy))
                         strMessage = "Add class successful";
                     else
@@ -97,7 +103,7 @@ public class ClassServlet extends HttpServlet {
                 case "/updateClass":
                     classStudy.setId(Integer.valueOf(strClassId));
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
-                    classStudy.setName(request.getParameter("Name"));
+                    classStudy.setName(strNameClass);
                     if(classDao.updateClass(classStudy))
                         strMessage = "Update class successful";
                     else
