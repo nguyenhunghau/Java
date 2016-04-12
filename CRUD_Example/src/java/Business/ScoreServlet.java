@@ -87,23 +87,16 @@ public class ScoreServlet extends HttpServlet {
         Score score= new Score();
         HttpSession sessions = request.getSession();
         if(sessions.getAttribute("user") == null)
-            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            response.sendRedirect("/CRUD_Example/logins.jsp");
         String strPath = request.getServletPath();
-        String strUrl = "/CRUD_Example/faces/View/Content/scoremanager.jsp";
+        String strUrl = "/CRUD_Example/scoremanager.jsp";
         String strId = request.getParameter("ID");
-        String strSemesterId = request.getParameter("SemesterId");
         String strStudentId = request.getParameter("StudentId");
-        String message = "";
+        int message = 0;
         
         try {
             
             switch(strPath){
-                case "/getListScore":
-                    strUrl += "?SemesterId=" + strSemesterId + "&&StudentId="+ strStudentId;
-                    //Get score of student in database
-                    List<Score> listScore = scoreDao.getListScore(strStudentId, strSemesterId);
-                    sessions.setAttribute("listScore", listScore); 
-                    break;
                 case "/updateScore":
                     score.setId(Integer.valueOf(strId));
                     score.setSubjectId(Integer.valueOf(request.getParameter("Subject")));
@@ -112,13 +105,13 @@ public class ScoreServlet extends HttpServlet {
                     score.setScrore_3(Float.valueOf(request.getParameter("Score3")));
                     
                     if(scoreDao.updateScore(score))
-                        message = "Update score sucessful";
+                        message = 5;
                     else
-                        message = "Can not update score";
+                        message = 6;
                     
                     //Get studentid of student after update 
                     strStudentId = scoreDao.getScore(strId).getStudentId();
-                    strUrl += "?StudentId=" + strStudentId;
+                    strUrl += "?StudentId=" + strStudentId + "&&message=" + message;
                      break;
                 default:
                     break;
@@ -129,8 +122,6 @@ public class ScoreServlet extends HttpServlet {
         } catch (Exception ex) {
               ex.printStackTrace();
         } finally{
-             sessions.setAttribute("message", message);
-            //Redirect to scoremanager.jsp
             response.sendRedirect(strUrl); 
         }
     }

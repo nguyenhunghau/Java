@@ -3,23 +3,22 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/root/source/Database/CRUD_Example/web/WEB-INF/web.xml</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/DAO/ClassStudyDao.java</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/newstudent.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/login.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/scoremanager.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/Business/ScoreServlet.java</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/Business/LoginServlet.java</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/Business/StudentServlet.java</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/updatestudent.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/Business/ClassServlet.java</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/updatescore.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/DAO/StudentDao.java</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/updateclass.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/DAO/ScoreDao.java</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/studentmanager.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/web/View/Content/classmanager.jsp</file>
-            <file>file:/root/source/Database/CRUD_Example/src/java/DAO/ConnectData.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/studentmanager.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/newstudent.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/DAO/ScoreDao.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/DAO/ConnectData.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/Business/ClassServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/classmanager.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/Business/StudentServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/Share/header.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/Business/ScoreServlet.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/updatescore.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/Share/beforelogin.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/WEB-INF/web.xml</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/src/java/DAO/SemesterDao.java</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/updatestudent.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/scoremanager.jsp</file>
+            <file>file:/C:/Users/UpdatusUser/Documents/GitHub/new/new/CRUD_Example/web/View/Content/Share/loginsuccess.jsp</file>
         </group>
     </open-files>
 </project-private>

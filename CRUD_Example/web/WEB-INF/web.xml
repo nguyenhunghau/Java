@@ -31,10 +31,6 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>StudentServlet</servlet-name>
-        <url-pattern>/getListStudent</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>StudentServlet</servlet-name>
         <url-pattern>/addNewStudent</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
@@ -44,10 +40,6 @@
     <servlet-mapping>
         <servlet-name>ScoreServlet</servlet-name>
         <url-pattern>/ScoreServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>ScoreServlet</servlet-name>
-        <url-pattern>/getListScore</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ScoreServlet</servlet-name>

@@ -30,24 +30,56 @@ public class SemesterDao {
         List<Semester> listSemester = new ArrayList<Semester>();
         //Get connection with mysql server
         Connection con = connect.getConnection();
-        String sql = "select * from Semester where CourseID = " + courseId ;
+        String sql = "select * from Semester where CourseID = ?";
         
         PreparedStatement prepareState;
         
         try{
             prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setInt(1, Integer.valueOf(courseId));
             ResultSet rs = prepareState.executeQuery();
             
             while(rs.next()) {
                 
                Semester semester = new Semester();
-               
+               semester.setCourseId(rs.getInt("CourseID"));
                semester.setId(rs.getInt("ID"));
                semester.setName(rs.getString("NameSemester"));
                listSemester.add(semester);
             }
             
             return listSemester;
+            
+        } catch(Exception ex){
+            System.err.println("Error Connect ");
+            return null;
+        }  finally {
+            con.close();
+        }
+    }
+    
+    public Semester getSemester(String strSemesterId) throws SQLException{
+        
+        List<Semester> listSemester = new ArrayList<Semester>();
+        //Get connection with mysql server
+        Connection con = connect.getConnection();
+        String sql = "select * from Semester where ID = ?" ;
+        
+        PreparedStatement prepareState;
+        Semester semester = new Semester();
+        
+        try{
+            prepareState = (PreparedStatement) con.prepareStatement(sql);
+            prepareState.setInt(1, Integer.valueOf(strSemesterId));
+            ResultSet rs = prepareState.executeQuery();
+            
+            while(rs.next()) {
+               semester.setId(rs.getInt("ID"));
+               semester.setName(rs.getString("NameSemester"));
+               semester.setCourseId(rs.getInt("CourseID"));
+            }
+            
+            return semester;
             
         } catch(Exception ex){
             System.err.println("Error Connect ");

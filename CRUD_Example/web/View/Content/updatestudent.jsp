@@ -20,6 +20,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Update student</title>
+        <link href="Css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/index.css" rel="stylesheet" type="text/css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="js/jquery.js"></script>
+        <link href="Css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.js"></script>
+        
        <script>
             function myFunction(){ 
                 var name=document.getElementById('Name');
@@ -73,24 +82,24 @@
         </script>
     </head>
     <body>
-        <jsp:include page = "../Share/header.jsp"></jsp:include>
+        <jsp:include page = "Share/header.jsp"></jsp:include>
         <%
             ClassStudyDao classDao = new ClassStudyDao();
             HttpSession sessions = request.getSession();
             CourseDao courseDao = new CourseDao();
-            String idStudent = request.getParameter("ID");
+            String strIdStudent = request.getParameter("ID");
+            String strCourseId = request.getParameter("courseid");
             StudentDao studentDao = new StudentDao();
-            Student student = studentDao.getStudent(idStudent);
+            Student student = studentDao.getStudent(strIdStudent);
+            ClassStudy classStudy = classDao.getClass(String.valueOf(student.getClassId()));
+            if(strCourseId == null)
+                strCourseId = String.valueOf(classStudy.getCourseId());
             User user = (User)session.getAttribute("user");
             if(user == null){
-                sessions.setAttribute("url", request.getRequestURI());
-                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+                sessions.setAttribute("url", request.getContextPath() + "/updatestudent.jsp?ID=" + strIdStudent);
+                response.sendRedirect("/CRUD_Example/logins.jsp");
             }
-            String strCourseId = request.getParameter("courseid");
             
-            if(strCourseId == null){
-                strCourseId = "1";
-            }
             List<Course> listCourse = courseDao.getListCourse();
             //Get list class
             List<ClassStudy> listClass = classDao.getListClass(strCourseId);
@@ -98,7 +107,7 @@
         <div class="container div-content">
             <div class="row">
                 <div class="col-md-3 menu_left">
-                    <jsp:include page = "../Share/menu_left.jsp"></jsp:include>
+                    <jsp:include page = "Share/menu_left.jsp"></jsp:include>
                 </div>
                 <div class="col-md-9 ">
                     <!--content_right-->
@@ -109,10 +118,10 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form name =" myform" onsubmit="return myFunction();" action = "../../updateStudent" method="post" />
+                                                <form name =" myform" onsubmit="return myFunction();" action = "/CRUD_Example/updateStudent" method="post" />
                                                     <div class="row">
                                                         <div class="form-group col-md-12">
-                                                            <input type="hidden" class = "form-control" name = "ID"  value = "<%= idStudent %>" id = "ID"/>
+                                                            <input type="hidden" class = "form-control" name = "ID"  value = "<%= strIdStudent %>" id = "ID"/>
                                                         </div>
                                                     </div>
                                                     <div class="row">
@@ -163,7 +172,7 @@
                                                                 <select class = "form-control" name = "CourseId" id = "course" >
                                                                    <%
                                                                        for(int i = 0; i < listCourse.size(); i++){ 
-                                                                            if(strCourseId.equals(String.valueOf(listCourse.get(i).getId()))){
+                                                                            if(listCourse.get(i).getId() == Integer.valueOf(strCourseId)){
                                                                     %>
 
                                                                                 <option value = "<%=listCourse.get(i).getId() %>" selected="selected">

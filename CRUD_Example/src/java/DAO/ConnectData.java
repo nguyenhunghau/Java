@@ -19,9 +19,9 @@ import java.sql.SQLException;
 public class ConnectData {
     private Connection con;
     private Statement statement;
-    private static String strConnectionString = "jdbc:mysql://172.30.4.230:3306/STUDENT_MANAGER?useUnicode=true&characterEncoding=utf-8";
+    private static String strConnectionString = "jdbc:mysql://127.0.0.1:3306/STUDENT_MANAGER?useUnicode=true&characterEncoding=utf-8";
     private String strUsername = "root";
-    private String strPassword = "hunghauit117";
+    private String strPassword = "nguyenhunghau";
      
     public Connection getConnection(){
         

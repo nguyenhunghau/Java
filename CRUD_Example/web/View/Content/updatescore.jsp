@@ -17,6 +17,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Update score</title>
+         <link href="Css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/index.css" rel="stylesheet" type="text/css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="js/jquery.js"></script>
+        <link href="Css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.js"></script>
+        
         <script>
             function validate(evt) {
                 var theEvent = evt || window.event;
@@ -36,22 +45,23 @@
             ScoreDao scoreDao = new ScoreDao();
             HttpSession sessions = request.getSession();
             User user = (User)session.getAttribute("user");
-            if(user == null){
-                sessions.setAttribute("url", request.getRequestURI());
-                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
-            }
             String strId = request.getParameter("ID");
+            if(user == null){
+                sessions.setAttribute("url", request.getContextPath() + "/updatescore.jsp?ID=" + strId);
+                response.sendRedirect("/CRUD_Example/logins.jsp");
+            }
+           
             Score score = scoreDao.getScore(strId);
             //Get list subject
             List<Subject> listSubject = subjectDao.getListSubject();
             
         %>
-        <jsp:include page = "../Share/header.jsp"></jsp:include>
+        <jsp:include page = "Share/header.jsp"></jsp:include>
         
         <div class="container div-content">
             <div class="row">
                 <div class="col-md-3 menu_left">
-                    <jsp:include page = "../Share/menu_left.jsp"></jsp:include>
+                    <jsp:include page = "Share/menu_left.jsp"></jsp:include>
                 </div>
                 <div class="col-md-9 ">
                     <!--content_right-->
@@ -62,7 +72,7 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form action = "../../updateScore" method="post" />
+                                                <form action = "/CRUD_Example/updateScore" method="post" />
                                                     
                                                     <div class="row">
                                                         <div class="form-group col-md-12">

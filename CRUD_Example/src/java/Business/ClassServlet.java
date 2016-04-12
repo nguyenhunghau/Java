@@ -76,18 +76,18 @@ public class ClassServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("utf-8");
+        request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        
-        String strNameClass =  new String(request.getParameter("Name").getBytes("iso-8859-1"), "UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+        String strNameClass = URLDecoder.decode(request.getParameter("Name"), "UTF-8");
         String path = request.getServletPath();
         HttpSession sessions = request.getSession();
         if(sessions.getAttribute("user") == null)
-            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            response.sendRedirect("/CRUD_Example/logins.jsp");
         ClassStudy classStudy = new ClassStudy();
         ClassStudyDao classDao = new ClassStudyDao();
-        String strMessage = "";
-        String strUrl = "/CRUD_Example/faces/View/Content/classmanager.jsp";
+        int message = 0;
+        String strUrl = "/CRUD_Example/classmanager.jsp";
         String strClassId = request.getParameter("ID");
         
         try {
@@ -95,19 +95,14 @@ public class ClassServlet extends HttpServlet {
                 case "/addClass":
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
                     classStudy.setName(strNameClass);
-                    if(classDao.addNewClass(classStudy))
-                        strMessage = "Add class successful";
-                    else
-                        strMessage = "Can not insert class";
+                    message = classDao.addNewClass(classStudy)? 7:8;
                     break;
+                    
                 case "/updateClass":
                     classStudy.setId(Integer.valueOf(strClassId));
                     classStudy.setCourseId(Integer.valueOf(request.getParameter("CourseId")));
                     classStudy.setName(strNameClass);
-                    if(classDao.updateClass(classStudy))
-                        strMessage = "Update class successful";
-                    else
-                        strMessage = "Can not update class";
+                    message = classDao.updateClass(classStudy)? 9:10;
                     break;
                 default:
                     break;
@@ -115,8 +110,7 @@ public class ClassServlet extends HttpServlet {
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            sessions.setAttribute("message", strMessage);
-            response.sendRedirect(strUrl);
+            response.sendRedirect(strUrl + "?message=" + message);
         }
     }
 

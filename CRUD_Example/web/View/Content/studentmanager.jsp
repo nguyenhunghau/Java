@@ -3,6 +3,7 @@
     Created on : Apr 4, 2016, 2:10:30 PM
     Author     : root
 --%>
+<%@page import="DAO.MessageDao"%>
 <%@page import="DTO.Score"%>
 <%@page import="DAO.ScoreDao"%>
 <%@page import="DTO.User"%>
@@ -16,9 +17,27 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Student manager</title>
+        <link href="Css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/index.css" rel="stylesheet" type="text/css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="js/jquery.js"></script>
+        <link href="Css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.js"></script>
+        
+        <script type = "text/javascript">
+            function searchStudent(){
+                var id = document.getElementById('ID').value;
+                var name = document.getElementById('Name').value;
+                
+                window.location = '/CRUD_Example/studentmanager.jsp?type=search&&ID=' +
+                                    id + '&&Name=' + name;
+            }
+        </script>
     </head>
     <body>
-        <jsp:include page = "../Share/header.jsp"></jsp:include>
+        <jsp:include page = "Share/header.jsp"></jsp:include>
         <%
             List<Student> listStudent = null;
             HttpSession sessions = request.getSession();
@@ -26,39 +45,49 @@
             ScoreDao scoreDao = new ScoreDao();
             User user = (User)session.getAttribute("user");
             if(user == null){
-                sessions.setAttribute("url", request.getRequestURI());
-                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+                sessions.setAttribute("url", request.getContextPath() + "/studentmanager.jsp");
+                response.sendRedirect("/CRUD_Example/logins.jsp");
             }
             // Get id of student we want to delete
             String strId = request.getParameter("ID");
+            String strName = "";
+            if(strId == null)
+                strId = "";
             // Get type of action such as update, add new student...
             String strType = request.getParameter("type");
             
-            if(strId != null){
-                //Delete all score of this student
-                List<Score> listscore = scoreDao.getListScore(strId, "");
-                for(Score score:listscore){
-                    scoreDao.deleteScore(String.valueOf(score.getId()));
-                }
-                //Delete student
-                studenDao.deleteStudent(strId);
-            }
-             
             // If the first pageload or then add new student or then update, get all student
-            if(strType == null || strType.equals("update") || strType.equals("addnew")){
+            if(strType == null){
                 listStudent = studenDao.getListStudent("", "");
             } else {
-                listStudent = (List<Student>)sessions.getAttribute("listStudent");
+                if(strType.equals("search")){
+                    strName = request.getParameter("Name");
+                     if(strName == null)
+                        strName = "";
+                    listStudent = studenDao.getListStudent(strId,strName);
+                } else {
+                    //Delete all score of this student
+                    List<Score> listscore = scoreDao.getListScore(strId, "");
+                    for(Score score:listscore){
+                        scoreDao.deleteScore(String.valueOf(score.getId()));
+                    }
+                    //Delete student
+                    studenDao.deleteStudent(strId);
+                    response.sendRedirect("/CRUD_Example/studentmanager.jsp");
+                }
+                
             }
            
-            String message = (String)sessions.getAttribute("message");
-            if(message == null)
-                message = "";
+            String strMessage = request.getParameter("message");
+            if(strMessage == null)
+                strMessage = "";
+            else
+                strMessage = MessageDao.getMessage(strMessage);
         %>
         <div class="container div-content">
             <div class="row">
                 <div class="col-md-3 menu_left">
-                    <jsp:include page = "../Share/menu_left.jsp"></jsp:include>
+                    <jsp:include page = "Share/menu_left.jsp"></jsp:include>
                 </div>
                 <div class="col-md-9 ">
                     <!--content_right-->
@@ -69,27 +98,25 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form action = "../../getListStudent" method="post">
-                                                    <div class="form-group col-md-12">
-                                                        <label class="col-md-12" ><%=message %> </label>
+                                                <div class="form-group col-md-12">
+                                                    <label class="col-md-12" ><%=strMessage %> </label>
+                                                </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="col-md-3" >ID: </label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class = "form-control" value="<%=strId %>" name="ID" id = "ID"/>
                                                     </div>
-                                                    <div class="form-group col-md-6">
-                                                        <label class="col-md-3" >ID: </label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class = "form-control" name = "ID"/>
-                                                        </div>
-                                                    </div>
+                                                </div>
 
-                                                    <div class="form-group col-md-6">
-                                                        <label class="col-md-3" >Name: </label>
-                                                        <div class="col-md-9">
-                                                            <input type="text" class = "form-control" name = "name"/>
-                                                        </div>
+                                                <div class="form-group col-md-6">
+                                                    <label class="col-md-3" >Name: </label>
+                                                    <div class="col-md-9">
+                                                        <input type="text" class = "form-control" name="Name" value="<%=strName %>" id = "Name"/>
                                                     </div>
-                                                    <div >
-                                                        <button type="submit"  class="btn div-submit-index">Search</button>
-                                                    </div>
-                                                </form>
+                                                </div>
+                                                <div >
+                                                    <button type="submit"  class="btn div-submit-index" onclick="searchStudent()">Search</button>
+                                                </div>
                                             </div>
                                             <% 
                                                     if(listStudent != null){
@@ -156,13 +183,13 @@
                                                                     <%= listStudent.get(i).getAddress()%>
                                                                 </td>
                                                                  <td align = "center">
-                                                                     <a href= "<%= "updatestudent.jsp?ID=" + listStudent.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
+                                                                     <a href= "<%= "updatestudent.jsp?ID=" + listStudent.get(i).getId() %>" ><img src="img/images/Edit.png" class = "img-edit" title="Edit" alt=""/></a>
                                                                 </td>
                                                                 <td align = "center">
-                                                                    <a href= "<%= "studentmanager.jsp?ID=" + listStudent.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
+                                                                    <a href= "<%= "studentmanager.jsp?type=delete&&ID=" + listStudent.get(i).getId() %>"><img src="img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
                                                                 </td>
                                                                 <td align = "center">
-                                                                    <a href= "<%= "scoremanager.jsp?StudentId=" + listStudent.get(i).getId() %>" ><img src="../../img/score.png" class = "img-edit" title="View score" alt=""/></a>
+                                                                    <a href= "<%= "scoremanager.jsp?StudentId=" + listStudent.get(i).getId() %>" ><img src="img/score.png" class = "img-edit" title="View score" alt=""/></a>
                                                                 
                                                                 </td>
                                                             </tr>   
@@ -171,15 +198,16 @@
                                             </div>
                                                 
                                                 <div class="row" style="margin-top:10px;margin-left: 20px;">
-                                                <a href="/CRUD_Example/faces/View/Content/newstudent.jsp">Create new student</a>
+                                                <a href="/CRUD_Example/newstudent.jsp">Create new student</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
             </div>
-        </div><!--kt_content right-->
-       
+        </div                                        
     </body>
 </html>

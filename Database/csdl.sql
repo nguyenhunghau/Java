@@ -96,10 +96,21 @@ insert into Class(NameClass,CourseID) Values('10A4',1);
 insert into Class(NameClass,CourseID) Values('10A5',1);
 insert into Class(NameClass,CourseID) Values('10A6',1);
 
+insert into Class(NameClass,CourseID) Values('10A1',2);
+insert into Class(NameClass,CourseID) Values('10A2',2);
+insert into Class(NameClass,CourseID) Values('10A3',2);
+insert into Class(NameClass,CourseID) Values('10A1',3);
+insert into Class(NameClass,CourseID) Values('10A2',3);
+insert into Class(NameClass,CourseID) Values('10A3',3);
+
 insert into Student Values(120002,'Nguyen Van A','2013-07-17 18:33:55','Mae','Ho Chi Minh','2013-07-17',1);
 
 insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S1',1,9,1);
 insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S2',1,2,6);
+insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S1',2,9,1);
+insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S2',2,2,6);
+insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S1',3,9,1);
+insert into Semester(NameSemester,CourseID,MonthBegin,MonthEnd) Values ('S2',3,2,6);
 
 insert into Subject(NameSubject) values ('Science');
 insert into Subject(NameSubject) values ('Literature');

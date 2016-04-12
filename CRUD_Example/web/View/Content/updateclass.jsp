@@ -11,12 +11,20 @@
 <%@page import="java.util.List"%>
 <%@page import="DAO.CourseDao"%>
 <%@page import="DAO.CourseDao"%>
-<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Update Class</title>
+        <link href="Css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/index.css" rel="stylesheet" type="text/css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="js/jquery.js"></script>
+        <link href="Css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.js"></script>
+        
         <script>
             function myFunction(){ 
             var name=document.getElementById('Name');
@@ -29,7 +37,7 @@
         </script>
     </head>
       <body>
-        <jsp:include page = "../Share/header.jsp"></jsp:include>
+        <jsp:include page = "Share/header.jsp"></jsp:include>
         <% 
             CourseDao courseDao = new CourseDao();
             HttpSession sessions = request.getSession();
@@ -40,13 +48,13 @@
             User user = (User)session.getAttribute("user");
             if(user == null){
                 sessions.setAttribute("url", request.getRequestURI());
-                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+                response.sendRedirect("/CRUD_Example/logins.jsp");
             }
         %>
         <div class="container div-content">
             <div class="row">
                 <div class="col-md-3 menu_left">
-                    <jsp:include page = "../Share/menu_left.jsp"></jsp:include>
+                    <jsp:include page = "Share/menu_left.jsp"></jsp:include>
                 </div>
                 <div class="col-md-9 ">
                     <!--content_right-->
@@ -57,7 +65,7 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="row">
-                                                <form name =" myform" onsubmit="return myFunction();" action = "../../updateClass" method="post"  />
+                                                <form name = "myform" onsubmit="return myFunction();" action = "/CRUD_Example/updateClass" method="post"  >
                                                     <input type="hidden" class = "form-control" id="name" name = "ID" value = "<%=strClassId %>" />
                                                             
                                                     <div class="row">

@@ -4,6 +4,8 @@
     Author     : root
 --%>
 
+<%@page import="DAO.MessageDao"%>
+<%@page import="java.lang.String"%>
 <%@page import="DTO.User"%>
 <%@page import="DTO.ClassStudy"%>
 <%@page import="java.util.List"%>
@@ -13,33 +15,46 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Class manager</title>
+        <link href="Css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Css/index.css" rel="stylesheet" type="text/css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="js/jquery.js"></script>
+        <link href="Css/main.css" rel="stylesheet" type="text/css"/>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/bootstrap.js"></script>
     </head>
+    
     <body>
-        <jsp:include page = "../Share/header.jsp"></jsp:include>
+        <jsp:include page = "Share/header.jsp"></jsp:include>
         <%
             ClassStudyDao classStudyDao = new ClassStudyDao();
             HttpSession sessions = request.getSession();
             User user = (User)session.getAttribute("user");
             if(user == null){
                 sessions.setAttribute("url", request.getRequestURI());
-                response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+                response.sendRedirect("/CRUD_Example/logins.jsp");
             }
+            
             //Check ID to delete
             String strId = request.getParameter("ID");
             if(strId != null){
                 classStudyDao.deleteClass(Integer.valueOf(strId));
+                response.sendRedirect("/CRUD_Example/classmanager.jsp");
             }
             List<ClassStudy> listClass = classStudyDao.getListClass("");
-            String strMessage = (String)sessions.getAttribute("message");
+            String strMessage = request.getParameter("message");
             if(strMessage == null){
                 strMessage = "";
+            } else {
+               strMessage = MessageDao.getMessage(request.getParameter("message"));
             }
         %>
         <div class="container div-content">
             <div class="row">
                 <div class="col-md-3 menu_left">
-                    <jsp:include page = "../Share/menu_left.jsp"></jsp:include>
+                    <jsp:include page = "Share/menu_left.jsp"></jsp:include>
                 </div>
                 <div class="col-md-9 ">
                     <!--content_right-->
@@ -50,7 +65,7 @@
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12 col-lg-12 list-student">
                                             <div class="form-group col-md-12">
-                                                        <label class="col-md-12" ><%=strMessage %> </label>
+                                                <label class="col-md-12" ><%=strMessage %> </label>
                                             </div>
                                             <div class="row">
                                                 <h3 style="text-align: center;color: red">Class manager</h3>
@@ -95,10 +110,10 @@
                                                                 </td>
                                                                
                                                                  <td align = "center">
-                                                                     <a href= "<%= "updateclass.jsp?ID=" + listClass.get(i).getId() %>" ><img src="../../img/images/Edit.png" class = "img-edit" title="Edit" alt="" /></a>
+                                                                     <a href= "<%= "updateclass.jsp?ID=" + listClass.get(i).getId() %>" ><img src="img/images/Edit.png" class = "img-edit" title="Edit" alt="" /></a>
                                                                 </td>
                                                                 <td align = "center">
-                                                                    <a href= "<%= "classmanager.jsp?ID=" + listClass.get(i).getId() %>"><img src="../../img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
+                                                                    <a href= "<%= "classmanager.jsp?ID=" + listClass.get(i).getId() %>"><img src="img/images/delete.png" class = "img-edit" title ="Delete" onclick="return confirm('Are you sure?')"/></a>
                                                                 </td>
                                                                
                                                             </tr>   
@@ -107,7 +122,7 @@
                                             </div>
                                                 
                                                 <div class="row" style="margin-top:10px;margin-left: 20px;">
-                                                <a href="/CRUD_Example/faces/View/Content/newclass.jsp">Create new class</a>
+                                                <a href="/CRUD_Example/newclass.jsp">Create new class</a>
                                             </div>
                                         </div>
                                     </div>

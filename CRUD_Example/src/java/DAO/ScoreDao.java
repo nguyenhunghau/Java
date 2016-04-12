@@ -106,7 +106,28 @@ public class ScoreDao {
     }
     
     private float getAverageScore(float score1, float score2, float score3){
-        return (float) Math.round((score1 + score2*2 + score3* 3)/6 * 100) / 100;
+        int count = 6;
+        float score_1 =  score1;
+        float score_2 =  score2;
+        float score_3 =  score3;
+        
+        if(score_1 == -1){
+            score_1 = 0;
+            count--;
+        }
+        if(score_2 == -1){
+            score_2 = 0;
+            count = count - 2;
+        }
+        if(score_3 == -1){
+            score_3 = 0;
+            count = count - 3;
+        }
+        if(count == 0)
+            return -1;
+        float sum = score_1 + score_2*2 + score_3* 3 ;
+        float result = (float)Math.round(sum/count * 100) / 100;
+        return result;
     }
     
     public boolean deleteScore(String Id) throws SQLException

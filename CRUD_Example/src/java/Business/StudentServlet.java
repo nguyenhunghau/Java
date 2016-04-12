@@ -9,6 +9,7 @@ import DTO.Student;
 import DTO.Subject;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -76,46 +77,38 @@ public class StudentServlet extends HttpServlet {
         response.setCharacterEncoding("utf-8");
         
         HttpSession session = request.getSession();
-         if(session.getAttribute("user") == null)
-            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
-        
+       
         //Set login
         if(session.getAttribute("user") == null)
-            response.sendRedirect("/CRUD_Example/faces/View/Content/login.jsp");
+            response.sendRedirect("/CRUD_Example/login.jsp");
         StudentDao studentDao = new StudentDao();
         SubjectDao subjectDao = new SubjectDao();
         ScoreDao scoreDao = new ScoreDao();
         Student student = new Student();
-        String strMessage = "";
         java.util.Date date;
-        String url = "/CRUD_Example/faces/View/Content/studentmanager.jsp";
+        String strUrl = "/CRUD_Example/studentmanager.jsp";
+        int message = 0;
         //Get server path to handle event
-        String path = request.getServletPath();
+        String strPath = request.getServletPath();
         //Get student id when update
         String strStudentId = request.getParameter("ID");
-        String strName = new String(request.getParameter("Name").getBytes("iso-8859-1"), "UTF-8");
-        String strAddress =  new String(request.getParameter("Address").getBytes("iso-8859-1"), "UTF-8");
+        String strName = request.getParameter("Name");
+        String strAddress = request.getParameter("Address");
+        if(strName != null )
+             strName = URLDecoder.decode(strName, "UTF-8");;
+        if(strAddress != null )
+             strAddress = URLDecoder.decode(strAddress, "UTF-8");
         
         //Format time for mysql
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         java.util.Date receive = Calendar.getInstance().getTime();
         
         try {
-            switch(path) {
-                case "/getListStudent":
-                     // Get Id and Name from input in form in file studentmanager.jsp
-                    String Id = request.getParameter("ID");
-                    String Name = request.getParameter("name");
-                    url += "?type=search";
-                    //Get student in database
-                    List<Student> listStudent = studentDao.getListStudent(Id, Name);
-                    session.setAttribute("listStudent", listStudent);
-
-                    break;
+            switch(strPath) {
                     
                 case "/updateStudent":
                     // Get data from inputs in form in file newstudent.jsp
-                    student.setId(request.getParameter("ID"));
+                    student.setId(strStudentId);
                     student.setAddress(strAddress);
                     date = format.parse(request.getParameter("Birthday")); 
                     student.setBirthday(new Date(date.getTime()));
@@ -125,15 +118,15 @@ public class StudentServlet extends HttpServlet {
                     student.setClassId(Integer.valueOf(request.getParameter("ClassId")));
                     //uppdate student into database
                     if(studentDao.updateStudent(student))
-                        strMessage = "Update student sucessfully";
+                        message = 1;
                     else
-                        strMessage = "Can not update this student";
+                        message = 2;
                     
                     break;
                     
                 case "/addNewStudent":
                     student.setId(studentDao.createId());
-                    student.setAddress(strName);
+                    student.setAddress(strAddress);
                     date = format.parse(request.getParameter("Birthday")); 
                     student.setBirthday(new Date(date.getTime()));
                     student.setGender(request.getParameter("Gender"));
@@ -142,7 +135,7 @@ public class StudentServlet extends HttpServlet {
                     student.setClassId(Integer.valueOf(request.getParameter("ClassId")));
                     //insert student into database
                     if(studentDao.addNewStudent(student)){
-                        strMessage = "Add student sucessfully";
+                        message = 3;
                         //<editor-fold defaultstate="collapsed" desc="Add score for this student in this semester">
                         //Get list subject
                         List<Subject> listSubject = subjectDao.getListSubject();
@@ -161,7 +154,7 @@ public class StudentServlet extends HttpServlet {
                         
                     }
                     else
-                        strMessage = "Can not insert into database";
+                        message = 4;
 
                     break;
                 default:
@@ -173,9 +166,7 @@ public class StudentServlet extends HttpServlet {
         } catch (Exception ex) {
               ex.printStackTrace();
         }  finally {
-             //send a message 
-            session.setAttribute("message", strMessage);
-            response.sendRedirect(url);
+            response.sendRedirect(strUrl += "?message=" + message);
         }
     }
 
