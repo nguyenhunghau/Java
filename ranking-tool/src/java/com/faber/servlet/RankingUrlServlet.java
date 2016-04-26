@@ -33,10 +33,10 @@ public class RankingUrlServlet extends HttpServlet {
         try {
             jsonObject = new JSONObject(json);
             String keyword = URLDecoder.decode(jsonObject.getString("keyword"));
-            String url =  jsonObject.getString("url");
+            String url = jsonObject.getString("url");
             String rank = ranking.getRanking(keyword, url);
             out.print(rank);
-            
+
         } catch (JSONException ex) {
             Logger.getLogger(RankingUrlServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
