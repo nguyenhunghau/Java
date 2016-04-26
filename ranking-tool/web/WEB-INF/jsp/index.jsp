@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
@@ -6,7 +7,7 @@
         <title>Get ranking url</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js" ></script>
         <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         <script>
 
@@ -30,6 +31,7 @@
                     var ranking = new Object();
                     ranking.keyword = $('#keyword').val();
                     ranking.url = $('#url').val();
+                    ranking.type = $('#type').val();
 
                     if (ranking.keyword === "" || ranking.url === "") {
                         $('#error').append("Please fill keyword and url");
@@ -61,10 +63,10 @@
     <body>
         <div class="container">
             <div class="row" style="margin-top: 50px;">
-                <div class="col-md-1"></div>
-                <div class="col-md-10" style="background:#DCDCDC; padding: 30px;">
+                <div class="col-md-2"></div>
+                <div class="col-md-8" style="background:#DCDCDC; padding: 30px;">
                     <div class="row">
-                        <h2>Ranking - tool</h2>
+                        <h2 >Ranking - tool</h2>
                         <div class="form-group">
                             <label for="keyword">Keyword:</label>
                             <input type="text" class="form-control" id="keyword">
@@ -72,6 +74,13 @@
                         <div class="form-group">
                             <label for="url">Url:</label>
                             <input type="text" class="form-control" id="url" >
+                        </div>
+                        <div class="form-group">
+                            <label for="type">Type:</label>
+                            <select class="form-control" id="type">
+                                <option value="1" selected = "selected">Seach ranking by domain</option>
+                                <option value="2">Seach ranking by Url</option>
+                            </select>
                         </div>
                         <div style="color: red">
                             <label id = "error"></label>
@@ -90,7 +99,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-2">
 
                 </div>
             </div>

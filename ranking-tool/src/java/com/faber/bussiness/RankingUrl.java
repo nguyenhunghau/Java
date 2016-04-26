@@ -2,6 +2,7 @@ package com.faber.bussiness;
 
 import java.io.UnsupportedEncodingException;
 import java.net.IDN;
+import java.net.URLDecoder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,9 +15,18 @@ import java.net.URLEncoder;
  */
 public class RankingUrl {
 
-    public String getRanking(String keyword, String url) throws UnsupportedEncodingException {
+    /**
+     * Get ranking of url when search on google
+     *
+     * @param keyword
+     * @param url
+     * @param type
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public String getRanking(String keyword, String url, String type) throws UnsupportedEncodingException {
 
-        Document document = null;
+        Document document;
         String keywordEndcode = URLEncoder.encode(keyword, "UTF-8").replaceAll(" ", "+");
 
         try {
@@ -27,29 +37,54 @@ public class RankingUrl {
                     .referrer("http://www.google.com")
                     .get();
 
-            //Get ranking of url
             String domain = getUrlDomainName(url);
-            Elements elements = document.select("cite[class*=_Rm]");
+
+            Elements elements = document.select("div[class=rc]").select("h3[class=r]").select("a");
             int size = (elements.size() < 50) ? elements.size() : 50;
             for (int i = 0; i < size; i++) {
                 Element element = elements.get(i);
-                String link = getUrlDomainName(element.text());
-                String linkEncode = IDN.toASCII(link);
-                if (link.contains(domain) || linkEncode.contains(domain)) {
-                    return String.valueOf(++i);
+                String link = element.attr("href");
+                link = URLDecoder.decode(getUrlFromHref(link), "UTF-8");
+
+                if (type.equals("1")) {
+                    link = getUrlDomainName(link);
+                    String domainEncode = IDN.toASCII(domain);
+
+                    if (link.contains(domain) || link.contains(domainEncode)) {
+                        return String.valueOf(++i);
+                    }
+                } else {
+                    String urlEncode = "";
+
+                    try {
+                        urlEncode = IDN.toASCII(url);
+
+                    } catch (Exception ex) {
+                        System.out.println("error to Ascii");
+                    }
+                    if (link.equals(url) || link.equals(urlEncode)) {
+                        return String.valueOf(++i);
+                    }
                 }
+
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("error");
         }
 
         return "50+";
     }
 
+    /**
+     * Get domain from a url
+     *
+     * @param url
+     * @return
+     */
     private String getUrlDomainName(String url) {
 
-        String domainName = new String(url);
+        String domainName = url;
 
         int index = domainName.indexOf("://");
 
@@ -65,13 +100,26 @@ public class RankingUrl {
             domainName = domainName.substring(0, index);
         }
 
-        // check for and remove a preceding 'www'
-        // followed by any sequence of characters (non-greedy)
-        // followed by a '.'
-        // from the beginning of the string
         domainName = domainName.replaceFirst("^www.*?\\.", "");
 
         return domainName;
+    }
+
+    /**
+     * Get url from attribute href
+     *
+     * @param url
+     * @return
+     */
+    private String getUrlFromHref(String href) {
+
+        String[] parts = href.split("url=");
+        if (parts.length < 2) {
+            return href;
+        }
+
+        String result = parts[1].split("&usg")[0];
+        return result;
     }
 
 }
