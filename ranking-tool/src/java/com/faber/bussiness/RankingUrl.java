@@ -1,6 +1,8 @@
 package com.faber.bussiness;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.IDN;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,7 +35,8 @@ public class RankingUrl {
             for (int i = 0; i < size; i++) {
                 Element element = elements.get(i);
                 String link = getUrlDomainName(element.text());
-                if (link.contains(domain)) {
+                String linkEncode = IDN.toASCII(link);
+                if (link.contains(domain) || linkEncode.contains(domain)) {
                     return String.valueOf(++i);
                 }
             }
