@@ -8,27 +8,28 @@ import org.w3c.dom.css.CSSRule;
 import org.w3c.dom.css.CSSStyleRule;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import java.io.*;
- 
- 
-public class ParseCss 
-{
-     public boolean Parse(String cssfile) 
-     {
- 
-         FileOutputStream out = null; 
-         PrintStream ps = null; 
-         boolean rtn = false;
- 
-         try
-         {
- 
-                // cssfile accessed as a resource, so must be in the pkg (in src dir).
-                //InputStream stream = oParser.getClass().getResourceAsStream(cssfile);
-                 InputStream stream = new FileInputStream("F:\\hoctap\\java\\save-website\\save-website\\save-website\\web\\css\\abc.css");
- 
-                 // overwrites and existing file contents
-                 out = new FileOutputStream("log.txt");
- 
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+
+public class ParseCss {
+
+    public boolean Parse(String cssfile) {
+
+        FileOutputStream out = null;
+        PrintStream ps = null;
+        boolean rtn = false;
+
+        try {
+
+            // cssfile accessed as a resource, so must be in the pkg (in src dir).
+            //InputStream stream = oParser.getClass().getResourceAsStream(cssfile);
+            InputStream stream = new FileInputStream("F:\\hoctap\\java\\save-website\\save-website\\save-website\\web\\css\\abc.css");
+
+            // overwrites and existing file contents
+            out = new FileOutputStream("log.txt");
+
 //                 if (out != null)
 //                 {
 //                     //log file
@@ -40,58 +41,67 @@ public class ParseCss
 //                     return rtn; 
 // 
 //                }
- 
- 
-                InputSource source = new InputSource(new InputStreamReader(stream));
-                String hb = source.getURI();
-                CSSOMParser parser = new CSSOMParser();
-                // parse and create a stylesheet composition
-                CSSStyleSheet stylesheet = parser.parseStyleSheet(source, null, null);
- 
-                //ANY ERRORS IN THE DOM WILL BE SENT TO STDERR HERE!!
-                // now iterate through the dom and inspect.
- 
-                CSSRuleList ruleList = stylesheet.getCssRules();
- 
-               for (int i = 0; i < ruleList.getLength(); i++) 
-               {
-                 CSSRule rule = ruleList.item(i);
-                 if (rule instanceof CSSStyleRule) 
-                 {
-                     CSSStyleRule styleRule=(CSSStyleRule)rule;
-                     CSSStyleDeclaration styleDeclaration = styleRule.getStyle();
- 
-                     for (int j = 0; j < styleDeclaration.getLength(); j++)                        // loop
-                     {
-                          String property = styleDeclaration.item(j);
-                          String a = property;
-                          a = styleDeclaration.getPropertyCSSValue(property).getCssText();
-                          a=  styleDeclaration.getPropertyPriority(property);                                  
-                     }
- 
- 
- 
-                  }// end of StyleRule instance test
-                } // end of ruleList loop
- 
-               if (out != null) out.close();
-               if (stream != null) stream.close();
-               rtn = true;
+            InputSource source = new InputSource(new InputStreamReader(stream));
+            String hb = source.getURI();
+            CSSOMParser parser = new CSSOMParser();
+            // parse and create a stylesheet composition
+            CSSStyleSheet stylesheet = parser.parseStyleSheet(source, null, null);
+
+            //ANY ERRORS IN THE DOM WILL BE SENT TO STDERR HERE!!
+            // now iterate through the dom and inspect.
+            CSSRuleList ruleList = stylesheet.getCssRules();
+
+            for (int i = 0; i < ruleList.getLength(); i++) {
+                CSSRule rule = ruleList.item(i);
+                if (rule instanceof CSSStyleRule) {
+                    CSSStyleRule styleRule = (CSSStyleRule) rule;
+                    CSSStyleDeclaration styleDeclaration = styleRule.getStyle();
+
+                    for (int j = 0; j < styleDeclaration.getLength(); j++) // loop
+                    {
+                        String property = styleDeclaration.item(j);
+                        String a = property;
+                        a = styleDeclaration.getPropertyCSSValue(property).getCssText();
+                        a = styleDeclaration.getPropertyPriority(property);
+                    }
+
+                }// end of StyleRule instance test
+            } // end of ruleList loop
+
+            if (out != null) {
+                out.close();
             }
-            catch (IOException ioe)
-            {
-                System.err.println ("IO Error: " + ioe);
+            if (stream != null) {
+                stream.close();
             }
-            catch (Exception e)
-            {
-                System.err.println ("Error: " + e);
- 
+            rtn = true;
+        } catch (IOException ioe) {
+            System.err.println("IO Error: " + ioe);
+        } catch (Exception e) {
+            System.err.println("Error: " + e);
+
+        } finally {
+            if (ps != null) {
+                ps.close();
             }
-            finally
-            {
-                if (ps != null) ps.close(); 
+        }
+
+        return rtn;
+
+    }
+
+    public void readFile(String file) throws UnsupportedEncodingException, MalformedURLException, IOException {
+       URL url = new URL(file);
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+       
+      // just want to do an HTTP GET here
+      connection.setRequestMethod("GET");
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(),  "utf8"), 8192);
+        
+                String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                inputLine = URLDecoder.decode(inputLine, "utf-8");
+                String a = "";
             }
- 
-            return rtn;
- 
-    }}
+        }
+    }

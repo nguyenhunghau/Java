@@ -14,7 +14,7 @@
         <script>
             $(document).ready( function (){
                 $('#btn_save').click( function () {
-                   saveWebsite(''); 
+                   //saveWebsite(''); 
                    setInterval(saveWebsite(''), 1000*60*60*24);
                 });
                 

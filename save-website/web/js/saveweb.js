@@ -56,10 +56,8 @@ var loadWeb = function () {
                 success: function (data) {
                     
                     if (data !== "false") {
-                        
-                        loadFile(data);
+                        loadFile(data.substring(0, param.lastIndexOf("&&type=")));
                     } else {
-                       
                         saveWebsite(url.substring(29));
                         //dialog_save_website_show(url);
                     }
@@ -77,7 +75,6 @@ var loadFile = function (link) {
     link = link.substring(29);
     link = head + link.replace(/\//g, "**").replace(/\?/g, "++") + ".html";
     $.get(link, function (data) {
-
         var attribute = data.split("</head>")[1];
         attribute = attribute.split(">")[0];
         if (attribute.toLowerCase().indexOf("class=\"") >= 0) {

@@ -5,24 +5,21 @@ import Faber.DAO.HandleUrlDAO;
 import Faber.DTO.UrlDTO;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,22 +28,17 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.AbstractList;
-import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static jdk.nashorn.internal.objects.ArrayBufferView.buffer;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.expression.spel.SpelMessage;
 //</editor-fold>
 
 /**
@@ -81,58 +73,65 @@ public class HanldeUrl {
             Element htmlTag = doc.select("html").first();
             String html = htmlTag.html();
 
+            //<editor-fold defaultstate="collapsed" desc="Save file css and change <a> element">
+            for (Element element : links) {
+
+                String link = element.attr("abs:href");
+                htmlNew = htmlItem = element.outerHtml();
+
+                if (element.tagName().equals("link")) {
+                    nameFile = link.substring(link.lastIndexOf("/") + 1).toLowerCase();
+                    String type = element.attr("type");
+                    if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
+                        nameFile = nameFile.split("\\?")[0];
+                    }
+                    destinationFile = folder + "/" + nameFile;
+
+                    if (nameFile.endsWith(".ico") || nameFile.endsWith(".png")
+                            || nameFile.endsWith(".jpg") || nameFile.endsWith(".jpeg")
+                            || nameFile.endsWith(".tiff") || nameFile.endsWith(".gif")) {
+                        saveImage(link, destinationFile);
+                    } else if (type.equals("text/css")) {
+                        nameFile = copyFileCss(link, destinationFile);
+                    }
+
+                    if (nameFile.contains(".")) {
+                        htmlNew = htmlItem.replace(element.attr("href"), website + "/" + nameFile);
+                    }
+                } else {
+                    if (link.equals("")) {
+                        continue;
+                    }
+
+                    htmlItem = htmlItem.replace("&amp;", "&");
+                    htmlNew = htmlItem.replaceFirst(element.attr("href"), "showcontent.htm?url=" + website + "/" + link);
+
+                }
+                html = html.replace(htmlItem, htmlNew);
+            }
+            //</editor-fold>
+
             //<editor-fold defaultstate="collapsed" desc="save file img and js">
             for (Element element : medias) {
                 htmlItem = element.outerHtml();
                 String src = element.attr("abs:src");
                 nameFile = src.substring(src.lastIndexOf("/") + 1);
-                destinationFile = folder + "/" + nameFile;
-                if (destinationFile.lastIndexOf("?") > destinationFile.lastIndexOf(".")) {
-                    destinationFile = destinationFile.split("\\?")[0];
+
+                if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
                     nameFile = nameFile.split("\\?")[0];
                 }
+
+                destinationFile = folder + "/" + nameFile;
 
                 if (element.tagName().equals("img")) {
                     saveImage(src, destinationFile);
 
+                } else if (nameFile.indexOf("jquery") == 0) {
+                    copyFileStream(src, destinationFile);
                 } else {
-                    if (nameFile.indexOf("jquery") == 0) {
-                        html = html.replace(htmlItem, "");
-                        continue;
-                    }
-
                     nameFile = copyFile(src, destinationFile, website);
                 }
-
                 htmlNew = htmlItem.replace(element.attr("src"), website + "/" + nameFile);
-                html = html.replace(htmlItem, htmlNew);
-            }
-            //</editor-fold>
-
-            //<editor-fold defaultstate="collapsed" desc="Save file css and change <a> element">
-            for (Element element : links) {
-
-                String link = element.attr("abs:href");
-                htmlItem = element.outerHtml();
-
-                if (element.tagName().equals("link")) {
-                    nameFile = link.substring(link.lastIndexOf("/") + 1);
-                    String type = element.attr("type");
-                    destinationFile = folder + "/" + nameFile;
-                    if (type.equals("text/css") && nameFile.contains(".css")) {
-                        destinationFile = destinationFile.substring(0,
-                                destinationFile.lastIndexOf(".css") + 4);
-                        nameFile = nameFile.substring(0, nameFile.lastIndexOf(".css") + 4);
-                    }
-                    nameFile = copyFileCss(link, destinationFile);
-
-                    htmlNew = htmlItem.replace(element.attr("href"), website + "/" + nameFile);
-                } else {
-                    link = createLink(url, link);
-                    htmlItem = htmlItem.replace("&amp;", "&");
-                    htmlNew = htmlItem.replace(element.attr("href"), "showcontent.htm?url=" + website + "/" + link);
-
-                }
                 html = html.replace(htmlItem, htmlNew);
             }
             //</editor-fold>
@@ -236,11 +235,16 @@ public class HanldeUrl {
 
         String result = "";
         String realAttribute = attribute;
-        if(attribute.indexOf("http") == 0)
+        if (attribute.length() <= 3) {
+            return "";
+        }
+        if (attribute.indexOf("http") == 0) {
             return attribute;
-        if(attribute.indexOf("//") == 0)
+        }
+        if (attribute.indexOf("//") == 0) {
             return "http:" + attribute;
-        
+        }
+
         char beginLetter = realAttribute.charAt(0);
         if (beginLetter == '\'' || beginLetter == '\"') {
             realAttribute = realAttribute.substring(1, realAttribute.lastIndexOf(beginLetter));
@@ -297,17 +301,15 @@ public class HanldeUrl {
         return strDate;
     }
 
-//    private String getFile(String html) {
-//        if(html.contains(".png"))
-//    }
     /**
      * Read content of fileUrl and write into destinationFile
      *
      * @param fileUrl
      * @param destinationFile
+     * @param linkWeb
      * @return
      */
-    public String copyFile(String fileUrl, String destinationFile, String linkWeb) {
+    private String copyFile(String fileUrl, String destinationFile, String linkWeb) {
 
         String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
         String fileName = destinationFile.substring(destinationFile.lastIndexOf("/") + 1);
@@ -320,9 +322,10 @@ public class HanldeUrl {
 
         try {
             try (PrintWriter writer = new PrintWriter(root + fileName + tailName, "UTF-8");
-                    BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileUrl).openStream()))) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileUrl).openStream(),"UTF-8"))) {
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
+                    inputLine =URLDecoder.decode(inputLine, "utf-8");
                     if (inputLine.contains("href=\"")) {
                         String source = inputLine.substring(inputLine.lastIndexOf("href=\"") + 6);
                         source = source.substring(0, source.indexOf("\""));
@@ -340,7 +343,7 @@ public class HanldeUrl {
                         copyFile(newLink, linkSave, linkWeb);
                         mapString.put(source, nameFile);
                     }
-                    writer.println(inputLine);
+                    writer.println(URLDecoder.decode(inputLine, "utf8") );
                 }
                 in.close();
                 writer.close();
@@ -359,6 +362,28 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
         return fileName + tailName;
+    }
+
+    private void copyFileStream(String fileUrl, String destinationFile) {
+
+        InputStream input = null;
+        FileOutputStream output = null;
+
+        try {
+            URL url = new URL(fileUrl);
+            input = url.openStream();
+            output = new FileOutputStream(destinationFile);
+            byte[] buffer = new byte[2048];
+            int data = 0;
+            while ((data = input.read(buffer)) != -1) {
+                output.write(buffer, 0, data);
+            }
+
+            input.close();
+            output.close();
+        } catch (Exception ex) {
+            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
