@@ -25,13 +25,24 @@ var saveWebsite = function (urlPara, idHtml, idCapture) {
     }
 
     if (/^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})).?)(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(url)) {
+             
         showSave(true);
         $.ajax({
             url: 'getContentWebsite',
             type: 'get',
             data: {url: url},
             success: function (data) {
-                createTable(data);
+                var result = JSON.parse(data);
+                if(idHtml == '#htmlWindow') {
+                    if(typeof result.html !== "undefined") {
+                        window.location.replace("showcontent.htm?url=save/" + result.html + "&&type=checked");
+                    } else {
+                        window.location.replace("showcontent.htm?url=save/" + result.pc );
+                    }
+                } else {
+                    createTable(result);
+                }
+                
                 showSave(false);
             }, error: function (jqXHR, textStatus, errorThrown) {
                 alert('error');
@@ -55,20 +66,18 @@ var loadWeb = function () {
         type = param.substring(param.lastIndexOf("&&type=") + 7);
     }
     if (type == "checked") {
-        
         loadFile(url);
     } else {
-        debugger;
         showSave(true);
+        url = url.substring(url.indexOf(parts[2]) + 24);
         //Check url exist or not 
         $.ajax({
             url: "checkUrl",
             type: "get",
             data: {url: url},
             success: function (data) {
-
                 if (data !== "false") {
-                    loadFile(data);
+                    loadFile("save/" + data);
                 } else {
                     dialog_save_website_show(url);
                 }
@@ -138,8 +147,8 @@ var viewHistory = function () {
                         "<tr><th>PC</th><th>Tablet</th><th>Mobile</th><th>Html</th>" +
                         "<th>Time save</th><th>Delete</th></tr></thead><tbody>";
                 if (len > 0) {
-                    $('#frequency').val(result[len - 1]);
-                    for (var i = 0; i < len - 1; i++) {
+                    $('#frequency').val(result[0].frequent);
+                    for (var i = 0; i < len; i++) {
                         content += createRow(result[i], i, true);
                     }
                     
@@ -163,63 +172,61 @@ var viewHistory = function () {
 };
 
 var createTable = function (data) {
-    var frequency = data.substring(data.lastIndexOf("&&frequency=") + 12);
-    data = data.substring(0,data.lastIndexOf("&&frequency="));
+    
     var head = "<table class='table table-bordered tbl_view' id = 'myTable'><thead>" +
             "<tr><th>PC</th><th>Tablet</th><th>Mobile</th><th>Html</th>" +
             "<th>Time save</th><th>Frequency</th><th>Delete</th></tr></thead><tbody>";
     var content = createRow(data, 1, false);
+     
     $('#browseHistory').append(head + content + "</tbody></table>");
-    addOptionForSelect(frequency);
+    addOptionForSelect(data.frequent);
 };
 
 var createRow = function (data, id, history) {
     id = "row" + id;
-    var parts = data.split('/');
-    var html = "", content = "", select = "";
-    var urlReal = data.substring(data.indexOf(parts[1]) + 24);
-    var urlPC = "save/" + parts[0] + "/" + parts[1] + "/capture/capturepc.jpg";
-    var linkHtml = "save/" + parts[0] + "/" + parts[1] + "/" +
-            urlReal.replace(/\//g, "**").replace(/\?/g, "++") + ".html";
+    var html = "Emply";
+    var urlPC = "Emply";
+    var urlTablet = "Emply";
+    var urlMobile = "Emply";
+    var d = $.datepicker.parseDate("M dd, yy", data.timeSave);
+    var time = $.datepicker.formatDate("yy-mm-dd", d);
+    var select = "";
+    
+    if(typeof data.html !== "undefined")
+        html = "<img src='images/view.png' class = 'img-edit'" +
+                "onclick = 'showhtml(\"" + data.html + "\")'/>";
+    if(typeof data.pc !== "undefined"){
+        alert("data.pc");
+        urlPC = "<img src='images/view.png' class = 'img-edit'" +
+                "onclick = 'showimage(\"" + data.pc + "\")'/>";}
+    if(typeof data.tablet !== "undefined")
+        urlTablet = "<img src='images/view.png' class = 'img-edit'" +
+                    "onclick = 'showimage(\"" + data.tablet + "\")'/>";
+    if(typeof data.mobile !== "undefined")
+        urlMobile = "<img src='images/view.png' class = 'img-edit'" +
+                    "onclick = 'showimage(\"" + data.mobile + "\")'/>";
+    
     if (!history)
-        select = "<td><select onchange='changeSchedule(\"" + urlReal + "\")' " +
+        select = "<td><select onchange='changeSchedule(\"" + data.linkUrl + "\")' " +
                 "id = 'timetable' class = 'form-control'></select></td>";
-    if (existUrl(linkHtml)) {
-        html = "<img src=\"images/view.png\" class = \"img-edit\" " +
-                "onclick = 'showhtml(\"save/" + data + "\")'/>";
-    } else {
-        html = "N/A";
-    }
-
-    if (existUrl(urlPC)) {
-        var urlTablet = "save/" + parts[0] + "/" + parts[1] + "/capture/capturetablet.jpg";
-        var urlMobile = "save/" + parts[0] + "/" + parts[1] + "/capture/capturemobile.jpg";
-        var time = parts[1].split("_")[0];
-        content += "<tr id = '" + id + "'><td><img src='images/view.png' class = 'img-edit' onclick = 'showimage(\"" +
-                urlPC + "\")'/>" + "</td><td><img src='images/view.png' class = 'img-edit'" +
-                "onclick = 'showimage(\"" + urlTablet + "\")'/>" + "</td><td>" +
-                "<img src='images/view.png' class = 'img-edit'" + "onclick = 'showimage(\"" +
-                urlMobile + "\")'/>" + "</td><td>" + html + "</td><td>" + time +
-                "</td>" + select + "<td>" + "<img src='images/delete.png'" +
-                "class = 'img-edit' onclick = 'deleteUrl(\"" + urlReal + "\",\"#" + id + "\",\"" + time + "\")' /></td></tr>";
-
-    } else {
-        content += "<tr><td>N/A</td><td>N/A</td><td>N/A</td><td>" +
-                +html + "</td><td>" + time + "</td>" + select + "<td><img src='images/delete.png'" +
-                " class = 'img-edit' onclick = 'deleteUrl(\"" + urlReal + "\",\"" + time + "\")' /></td></tr>";
-    }
+    
+    var content = "<tr id = '" + id + "'><td>" + urlPC + "</td><td>" + urlTablet +
+                  "</td><td>" + urlMobile + "</td><td>" + html + "</td><td>" + time +
+                  "</td>" + select + "<td>" + "<img src='images/delete.png' class = 'img-edit'" +
+                  "onclick = 'deleteUrl(\"" + data.linkUrl + "\",\"#" + id + "\",\"" + time + "\")' /></td></tr>";
+          
     return content;
 };
 
 var showimage = function (link) {
-    var url = "showimage.htm?url=" + link;
+    var url = "showimage.htm?url=save/" + link;
     var win = window.open(url, '_blank');
     if (win)
         focus();
 };
 
 var showhtml = function (link) {
-    var url = "showcontent.htm?url=" + link + "&&type=checked";
+    var url = "showcontent.htm?url=save/" + link + "&&type=checked";
     var win = window.open(url, '_blank');
     if (win)
         focus();

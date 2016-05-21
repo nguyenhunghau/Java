@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.IDN;
 import java.net.URL;
@@ -20,6 +21,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -61,6 +64,8 @@ public class HanldeUrl {
 
     public String saveWebsite(String url, String type, String user) throws SchedulerException, InterruptedException {
         String currentTime = getCurrentTime();
+        UrlDTO userDto = new UrlDTO();
+        Gson gson = new Gson();
         String result = "";
         try {
 
@@ -76,6 +81,7 @@ public class HanldeUrl {
             file.mkdir();
             if (type.equals("html") || type.equals("both")) {
                 getHtml(url, folder, website);
+                userDto.setHtml(user + "/" + currentTime + "/" + url);
             }
 
             if (type.equals("capture") || type.equals("both")) {
@@ -85,26 +91,24 @@ public class HanldeUrl {
                 captureMobile(driver, url, folder + "/capture/capturemobile.jpg");
                 captureTablet(driver, url, folder + "/capture/capturetablet.jpg");
                 driver.close();
+                userDto.setPc(user + "/" + currentTime + "/capture/capturepc.jpg");
+                userDto.setTablet(user + "/" + currentTime + "/capture/capturetablet.jpg");
+                userDto.setMobile(user + "/" + currentTime + "/capture/capturemobile.jpg");
             }
 
             //Save into database
-            UrlDTO userDto = new UrlDTO();
-            userDto.setLinkUrl(user + "/" + currentTime + "/" + url);
+            userDto.setLinkUrl(url);
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             Date parsed = format.parse(currentTime.split("_")[0]);
             userDto.setTimeSave(new java.sql.Date(parsed.getTime()));
-            userDto.setPc(user + "/" + currentTime + "/capture/capturepc.jpg");
-            userDto.setTablet(user + "/" + currentTime + "/capture/capturetablet.jpg");
-            userDto.setMobile(user + "/" + currentTime + "/capture/capturemobile.jpg");
-            userDto.setHtml(user + "/" + currentTime + "/" + url);
             userDto.setIdUser(Integer.valueOf(user));
             userDto.setFrequent(1);
             if (urlDao.addUrl(userDto)) {
-                result = user + "/" + currentTime + "/" + url + "&&frequency=1" ;
+                result = gson.toJson(userDto);
             }
             renameFile(absolute + "save/" + user, absolute + "save/abc");
             Thread.sleep(5000);
-            renameFile(absolute + "save/abc",absolute + "save/" + user);
+            renameFile(absolute + "save/abc", absolute + "save/" + user);
         } catch (ParseException ex) {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -132,6 +136,10 @@ public class HanldeUrl {
             for (Element element : links) {
 
                 String link = element.attr("abs:href");
+                if (link.equals("http://stackoverflow.com/questions/1066453/mysql-group-by-and-order-by?lastactivity")) {
+                    String afds = "link";
+                }
+
                 htmlNew = htmlItem = element.outerHtml();
 
                 if (element.tagName().equals("link")) {
@@ -142,7 +150,7 @@ public class HanldeUrl {
                     }
                     destinationFile = folder + "/" + nameFile;
                     if (type.equals("text/css")) {
-                        nameFile = copyFileCss(link, destinationFile);
+                        nameFile = copyFileStream(link, destinationFile);
                     }
 
                     if (nameFile.contains(".")) {
@@ -154,7 +162,7 @@ public class HanldeUrl {
                     }
 
                     htmlItem = htmlItem.replace("&amp;", "&");
-                    htmlNew = htmlItem.replaceFirst(element.attr("href"), "showcontent.htm?url=" + website + "/" + link);
+                    htmlNew = htmlItem.replace(element.attr("href"), "showcontent.htm?url=" + website + "/" + link);
 
                 }
                 html = html.replace(htmlItem, htmlNew);
@@ -175,7 +183,7 @@ public class HanldeUrl {
                     destinationFile = folder + "/" + nameFile;
 
                     if (nameFile.indexOf("jquery") == 0) {
-                        copyFileStream(src, destinationFile);
+                        nameFile = copyFileStream(src, destinationFile);
                     } else {
                         nameFile = copyFile(src, destinationFile, website);
                     }
@@ -186,7 +194,7 @@ public class HanldeUrl {
             //</editor-fold>
 
             //Change html and save file
-            html = html.replace("“", "&#8220");
+            html = html.replace("document.location", "").replace("“", "&#8220");
             String linkSave = folder + "/" + (url.replaceAll("/", "**")).replace("?", "++") + ".html";
             saveFile(html, linkSave);
         } catch (IOException e) {
@@ -196,7 +204,7 @@ public class HanldeUrl {
     public String getListWebsite(String url, String user) {
 
         try {
-            List<String> listUrl = urlDao.getListUrl(url, user);
+            List<UrlDTO> listUrl = urlDao.getListUrl(url, user);
             Gson gson = new Gson();
             String result = gson.toJson(listUrl);
             return result;
@@ -206,55 +214,23 @@ public class HanldeUrl {
 
     }
 
+    public String checkUrl(String url, String user) {
+        return urlDao.checkUrl(url, user);
+    }
+
     public String checkUrl(String url, java.sql.Date dateSave, String user) {
 
         String result = "false";
+        Gson gson = new Gson();
 
         try {
-//            String absolute = getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
-//            absolute = absolute.replace("build/web/WEB-INF/classes/", "web/");
-//            absolute = absolute.substring(5, absolute.length());
-//            String head = url.substring(0, 28);
-//            String tailUrl = url.substring(29);
-            if (dateSave == null) {
-                result = urlDao.checkUrl(url, user);
+            UrlDTO urlDto = urlDao.checkUrl(url, dateSave, user);
+            if (urlDto.getLinkUrl() != null && !urlDto.getLinkUrl().equals("")) {
+                result = gson.toJson(urlDto);
             }
-            result = urlDao.checkUrl(url, dateSave, user);
-
-//            if (!result.equals("false")) {
-//                String tail = tailUrl.replace("/", "**") + ".html";
-//                String namefolder = absolute + head;
-//                File forder = new File(namefolder);
-//                File[] listOfFiles = forder.listFiles();
-//                Path path = Paths.get(namefolder + "/" + tail);
-//                Charset charset = StandardCharsets.UTF_8;
-//                String content = new String(Files.readAllBytes(path), charset);
-//
-//                for (File file : listOfFiles) {
-//                    if (file.getName().contains(".js") && !file.getName().contains("_faber.js")) {
-//                        String wholeFilename = file.getName();
-//                        String filename = wholeFilename.substring(0, wholeFilename.lastIndexOf(".js"));
-//                        String oldFile = namefolder + "/" + filename + ".js";
-//                        String newFile = namefolder + "/" + filename + "_faber.js";
-//                        renameFile(oldFile, newFile);
-//                        content = content.replace(filename + ".js", filename + "_faber.js");
-//                    }
-//                    if (file.getName().contains(".css") && !file.getName().contains("_faber.css")) {
-//                        String wholeFilename = file.getName();
-//                        String filename = wholeFilename.substring(0, wholeFilename.lastIndexOf(".css"));
-//                        String oldFile = namefolder + "/" + filename + ".css";
-//                        String newFile = namefolder + "/" + filename + "_faber.css";
-//                        renameFile(oldFile, newFile);
-//                        content = content.replace(filename + ".css", filename + "_faber.css");
-//                    }
-//                }
-//
-//                Files.write(path, content.getBytes(charset));
-//            }
         } catch (Exception e) {
 
         }
-
         return result;
     }
 
@@ -275,6 +251,10 @@ public class HanldeUrl {
 
         Scheduler scheduler;
         try {
+            String result = urlDao.checkUrl(url, user);
+            if (!result.equals("false")) {
+                return;
+            }
             scheduler = new StdSchedulerFactory().getScheduler();
             JobDetail job = JobBuilder.newJob(SchedulerJob.class)
                     .withIdentity(url, user).build();
@@ -494,15 +474,29 @@ public class HanldeUrl {
         return fileName + tailName;
     }
 
-    private void copyFileStream(String fileUrl, String destinationFile) {
+    private String copyFileStream(String fileUrl, String destinationFile) {
 
+        String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
+        String fileName = destinationFile.substring(destinationFile.lastIndexOf("/") + 1);
+        String tailName = "";
         InputStream input = null;
         FileOutputStream output = null;
 
+        if (fileName.contains(".")) {
+            tailName = fileName.substring(fileName.lastIndexOf("."));
+            fileName = fileName.substring(0, fileName.lastIndexOf("."));
+        }
+
         try {
             URL url = new URL(fileUrl);
+            File file = new File(root + fileName + tailName);
+            while (file.exists()) {
+                fileName += "c";
+                file = new File(root + fileName + tailName);
+            }
+
             input = url.openStream();
-            output = new FileOutputStream(destinationFile);
+            output = new FileOutputStream(root + fileName + tailName);
             byte[] buffer = new byte[2048];
             int data = 0;
             while ((data = input.read(buffer)) != -1) {
@@ -514,6 +508,7 @@ public class HanldeUrl {
         } catch (Exception ex) {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return fileName + tailName;
     }
 
     /**
@@ -528,6 +523,8 @@ public class HanldeUrl {
         String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
         String fileName = destinationFile.substring(destinationFile.lastIndexOf("/") + 1);
         String tailName = "";
+        InputStream input = null;
+        FileOutputStream output = null;
 
         if (fileName.contains(".")) {
             tailName = fileName.substring(fileName.lastIndexOf("."));
@@ -586,15 +583,17 @@ public class HanldeUrl {
             return false;
         }
     }
-    
+
     public String formatUrl(String url) {
-        if(url.equals("") || url == null || url.length() > 63)
+        if (url.equals("") || url == null || url.length() > 63) {
             return url;
+        }
         String result = IDN.toASCII(url);
-        while(result.matches(".*[#/?]$"))
+        while (result.matches(".*[#/?]$")) {
             result = result.substring(0, result.length() - 1);
+        }
         return result;
-        
+
     }
 
 }

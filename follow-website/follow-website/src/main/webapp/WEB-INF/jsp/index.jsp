@@ -11,7 +11,8 @@
     <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/saveweb.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
-    <script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript">
         $(document).ready(function () {
             $('#schedule').hide();
             $('#btn_save').click(function () {

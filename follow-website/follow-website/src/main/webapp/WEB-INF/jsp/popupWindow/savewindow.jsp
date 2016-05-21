@@ -7,7 +7,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#cancel').click(function () {
-            parent.history.back();
             dialog_save_website_hide();
         });
 
@@ -39,8 +38,8 @@
     </div>
 
     <div class="row">
-        <div class="col-md-3 col-sm-3"></div>
-        <div class = "col-md-2  col-sm-2" style="margin-top: 5px">
+        <div class="col-md-2 col-sm-2"></div>
+        <div class = "col-md-4 col-sm-4" style="margin-top: 5px">
             <label class="checkbox-inline"><input type="checkbox" id="htmlWindow" checked>html</label>
             <label class="checkbox-inline"><input type="checkbox" id="captureWindow" checked>capture</label>
         </div>
@@ -54,7 +53,6 @@
                 <a id="cancel" class="btn btn-main">Cancel</a>
             </div>
         </div>
-        <div class="col-md-3"></div>
     </div>
 </div>
 <div id="overlay"></div>

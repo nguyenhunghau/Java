@@ -61,7 +61,7 @@ public class HandleUrlServlet extends HttpServlet {
             }
 
             if (path.equals("/checkUrl")) {
-                out.print(handleUrl.checkUrl(url, null, user));
+                out.print(handleUrl.checkUrl(url, user));
             }
 
             if (path.equals("/deleteUrl")) {

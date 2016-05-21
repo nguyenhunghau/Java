@@ -20,6 +20,11 @@
         });
     </script>
     <body>
+        <%
+            HttpSession sessions = request.getSession();
+            if(session.getAttribute("account") == null)
+                response.sendRedirect("login.htm");
+        %>
         <div class = "container">
             <div class="row">
                 <img id = "img_capture" style="width: 100%;height: 100%;margin-top: 10px;margin-bottom: 10px;"/>

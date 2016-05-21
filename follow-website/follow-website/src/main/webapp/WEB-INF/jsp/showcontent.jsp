@@ -21,5 +21,11 @@
     
     <body>
         <jsp:include page="popupWindow/save.jsp"/>
+        <jsp:include page="popupWindow/savewindow.jsp"/>
+        <%
+            HttpSession sessions = request.getSession();
+            if(session.getAttribute("account") == null)
+                response.sendRedirect("login.htm");
+        %>
     </body>
 </html>

@@ -20,28 +20,34 @@ public class UrlDAO {
      * @param url
      * @return
      */
-    public List<String> getListUrl(String url, String user) {
+    public List<UrlDTO> getListUrl(String url, String user) {
 
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        List<String> list = new ArrayList<>();
+        List<UrlDTO> list = new ArrayList<>();
         int freequency = 0;
 
         try {
-            String sql = "SELECT * FROM Url WHERE LinkUrl LIKE ? and IdUser = ? ORDER BY TimeSave DESC";
+            String sql = "SELECT * FROM Url WHERE LinkUrl = ? and IdUser = ? ORDER BY TimeSave DESC";
             con = (Connection) MySQLConnect.getConnection();
             ps = (PreparedStatement) con.prepareStatement(sql);
-            ps.setString(1, "%" + url);
+            ps.setString(1, url);
             ps.setInt(2, Integer.valueOf(user));
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                list.add(rs.getString("LinkUrl"));
-                freequency = rs.getInt("Frequent");
+                UrlDTO urlDto = new UrlDTO();
+                urlDto.setIdUser(rs.getInt("IdUser"));
+                urlDto.setFrequent(rs.getInt("Frequent"));
+                urlDto.setLinkUrl(rs.getString("LinkUrl"));
+                urlDto.setPc(rs.getString("Pc"));
+                urlDto.setTimeSave(rs.getDate("TimeSave"));
+                urlDto.setMobile(rs.getString("Mobile"));
+                urlDto.setTablet(rs.getString("Tablet"));
+                urlDto.setHtml(rs.getString("Html"));
+                list.add(urlDto);
             }
-            if(list.size() > 0)
-                list.add(String.valueOf(freequency));
             
         } catch (Exception ex) {
         } finally {
@@ -69,18 +75,18 @@ public class UrlDAO {
      * @param user
      * @return
      */
-    public String checkUrl(String url, java.sql.Date dateSave, String user) {
+    public UrlDTO checkUrl(String url, java.sql.Date dateSave, String user) {
 
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String result = "false";
+        UrlDTO urlDto = new UrlDTO();
 
         try {
-            String sql = "SELECT * FROM Url WHERE LinkUrl LIKE ? AND IdUser = ? ORDER BY TimeSave DESC";
+            String sql = "SELECT * FROM Url WHERE LinkUrl = ? AND IdUser = ? ORDER BY TimeSave DESC";
             con = (Connection) MySQLConnect.getConnection();
             ps = (PreparedStatement) con.prepareStatement(sql);
-            ps.setString(1, "%" + url);
+            ps.setString(1, url);
             ps.setInt(2, Integer.valueOf(user));
             rs = ps.executeQuery();
 
@@ -89,9 +95,16 @@ public class UrlDAO {
                 String strDate = date.toString();
                 String strDateSave = dateSave.toString();
                 if (strDate.equals(strDateSave)) {
-                    result = rs.getString("linkUrl") + "&&frequency=" + rs.getInt("Frequent");
+                    urlDto.setIdUser(rs.getInt("IdUser"));
+                    urlDto.setFrequent(rs.getInt("Frequent"));
+                    urlDto.setLinkUrl(rs.getString("LinkUrl"));
+                    urlDto.setPc(rs.getString("Pc"));
+                    urlDto.setTimeSave(rs.getDate("TimeSave"));
+                    urlDto.setMobile(rs.getString("Mobile"));
+                    urlDto.setTablet(rs.getString("Tablet"));
+                    urlDto.setHtml(rs.getString("Html"));
+                    break;
                 }
-                break;
             }
         } catch (Exception ex) {
         } finally {
@@ -108,7 +121,7 @@ public class UrlDAO {
             } catch (Exception e) {
             }
         }
-        return result;
+        return urlDto;
     }
     
     public String checkUrl(String url, String user) {
@@ -119,15 +132,15 @@ public class UrlDAO {
         String result = "false";
 
         try {
-            String sql = "SELECT * FROM Url WHERE LinkUrl LIKE ? AND IdUser = ? ORDER BY TimeSave DESC";
+            String sql = "SELECT * FROM Url WHERE LinkUrl = ? AND IdUser = ? ORDER BY TimeSave DESC";
             con = (Connection) MySQLConnect.getConnection();
             ps = (PreparedStatement) con.prepareStatement(sql);
-            ps.setString(1, "%" + url);
+            ps.setString(1, url);
             ps.setInt(2, Integer.valueOf(user));
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                result = rs.getString("linkUrl");
+                result = rs.getString("Html");
                 break;
             }
         } catch (Exception ex) {
@@ -193,9 +206,9 @@ public class UrlDAO {
         PreparedStatement ps = null;
         try {
             con = (Connection) MySQLConnect.getConnection();
-            String sql = "DELETE FROM Url WHERE LinkUrl LIKE ? AND TimeSave = ? AND IdUser = ?";
+            String sql = "DELETE FROM Url WHERE LinkUrl = ? AND TimeSave = ? AND IdUser = ?";
             ps = (PreparedStatement) con.prepareStatement(sql);
-            ps.setString(1, "%" + url);
+            ps.setString(1, url);
             ps.setDate(2, time);
             ps.setInt(3, Integer.valueOf(user));
             ps.executeUpdate();
@@ -221,10 +234,10 @@ public class UrlDAO {
         PreparedStatement ps = null;
         try {
             con = (Connection) MySQLConnect.getConnection();
-            String sql = "UPDATE Url SET Frequent = ? WHERE LinkUrl LIKE ? AND IdUser = ?";
+            String sql = "UPDATE Url SET Frequent = ? WHERE LinkUrl = ? AND IdUser = ?";
             ps = (PreparedStatement) con.prepareStatement(sql);
             ps.setInt(1, Integer.valueOf(freequency));
-            ps.setString(2, "%" + url);
+            ps.setString(2,  url);
             ps.setInt(3, Integer.valueOf(user));
             ps.executeUpdate();
             return true;
