@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
  * @author Nguyen Hung Hau
  */
 public class UserServlet extends HttpServlet {
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -22,12 +22,11 @@ public class UserServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String json = request.getParameter("json");
         String path = request.getServletPath();
-        
-        if(path.equals("/checkLogin")) {
+
+        if (path.equals("/checkLogin")) {
             HandleUser handleUser = new HandleUser();
             boolean result = handleUser.checkLogin(json, session);
             out.print(result);
         }
     }
-    
 }

@@ -1,3 +1,8 @@
+var param = function (name, value) {
+    this.name = name;
+    this.value = value;
+};
+
 var saveWebsite = function (urlPara, idHtml, idCapture) {
     $('#info').html('');
     $('#schedule').hide();
@@ -9,40 +14,44 @@ var saveWebsite = function (urlPara, idHtml, idCapture) {
         $('#info').append("Please fill url");
         return false;
     }
+    var filterParam = new Array();
+    var type;
     if ($(idHtml).is(":checked")) {
         if ($('#capture').is(":checked")) {
-            url += "#*type=both";
+            type = "both";
         } else {
-            url += "#*type=html";
+            type = "html";
         }
     } else {
         if ($(idCapture).is(":checked")) {
-            url += "#*type=capture";
+            type = "capture";
         } else {
             $('#info').append('choose at least one option');
             return false;
         }
     }
-
+    filterParam[filterParam.length] = new param("url", url);
+    filterParam[filterParam.length] = new param("type", type);
+    
     if (/^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})).?)(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(url)) {
-             
+
         showSave(true);
         $.ajax({
             url: 'getContentWebsite',
             type: 'get',
-            data: {url: url},
+            data: {para: filterParam},
             success: function (data) {
                 var result = JSON.parse(data);
-                if(idHtml == '#htmlWindow') {
-                    if(typeof result.html !== "undefined") {
+                if (idHtml === '#htmlWindow') {
+                    if (typeof result.html !== "undefined") {
                         window.location.replace("showcontent.htm?url=save/" + result.html + "&&type=checked");
                     } else {
-                        window.location.replace("showcontent.htm?url=save/" + result.pc );
+                        window.location.replace("showcontent.htm?url=save/" + result.pc);
                     }
                 } else {
                     createTable(result);
                 }
-                
+
                 showSave(false);
             }, error: function (jqXHR, textStatus, errorThrown) {
                 alert('error');
@@ -53,62 +62,6 @@ var saveWebsite = function (urlPara, idHtml, idCapture) {
         $('#info').append('url is wrong format');
     }
     ;
-};
-
-var loadWeb = function () {
-    
-    var param = getParameter("url");
-    var parts = param.split("/");
-    var url = param;
-    var type = "";
-    if (param.lastIndexOf("&&type=") > 0) {
-        url = param.substring(0, param.lastIndexOf("&&type="));
-        type = param.substring(param.lastIndexOf("&&type=") + 7);
-    }
-    if (type == "checked") {
-        loadFile(url);
-    } else {
-        showSave(true);
-        url = url.substring(url.indexOf(parts[2]) + 24);
-        //Check url exist or not 
-        $.ajax({
-            url: "checkUrl",
-            type: "get",
-            data: {url: url},
-            success: function (data) {
-                if (data !== "false") {
-                    loadFile("save/" + data);
-                } else {
-                    dialog_save_website_show(url);
-                }
-                showSave(false);
-
-            }, error: function (jqXHR, textStatus, errorThrown) {
-                alert('error');
-
-            }
-        });
-    }
-    showSave(false);
-};
-
-var loadFile = function (link) {
-    var parts = link.split("/");
-    var head = parts[0] + "/" + parts[1] + "/" + parts[2];
-    link = link.substring(link.indexOf(parts[2]) + 24);
-    link = head + "/" + link.replace(/\//g, "**").replace(/\?/g, "++") + ".html";
-    $.get(link, function (data) {
-        var attribute = data.split("</head>")[1];
-        attribute = attribute.split(">")[0];
-        if (attribute.toLowerCase().indexOf("class=\"") >= 0) {
-            attribute = attribute.split("class=\"")[1].split("\"")[0];
-            $('body').addClass(attribute);
-        }
-        $('body').append(data);
-    });
-    $('link[href="css/style.css"]').remove();
-    $('link[href="css/bootstrap.min.css"]').remove();
-    $('#popup_save_website_related').hide();
 };
 
 var initdialog = function () {
@@ -151,7 +104,7 @@ var viewHistory = function () {
                     for (var i = 0; i < len; i++) {
                         content += createRow(result[i], i, true);
                     }
-                    
+
                     content += "</tbody></table>";
                     //$('#info').append('Find all ' + len + " result");
                     $('#browseHistory').append(content);
@@ -172,12 +125,12 @@ var viewHistory = function () {
 };
 
 var createTable = function (data) {
-    
+
     var head = "<table class='table table-bordered tbl_view' id = 'myTable'><thead>" +
             "<tr><th>PC</th><th>Tablet</th><th>Mobile</th><th>Html</th>" +
             "<th>Time save</th><th>Frequency</th><th>Delete</th></tr></thead><tbody>";
     var content = createRow(data, 1, false);
-     
+
     $('#browseHistory').append(head + content + "</tbody></table>");
     addOptionForSelect(data.frequent);
 };
@@ -191,42 +144,35 @@ var createRow = function (data, id, history) {
     var d = $.datepicker.parseDate("M dd, yy", data.timeSave);
     var time = $.datepicker.formatDate("yy-mm-dd", d);
     var select = "";
-    
-    if(typeof data.html !== "undefined")
+
+    if (typeof data.html !== "undefined")
         html = "<img src='images/view.png' class = 'img-edit'" +
-                "onclick = 'showhtml(\"" + data.html + "\")'/>";
-    if(typeof data.pc !== "undefined"){
-        alert("data.pc");
+                "onclick = 'showFile(\"" + data.html + "\")'/>";
+    if (typeof data.pc !== "undefined") {
         urlPC = "<img src='images/view.png' class = 'img-edit'" +
-                "onclick = 'showimage(\"" + data.pc + "\")'/>";}
-    if(typeof data.tablet !== "undefined")
+                "onclick = 'showFile(\"" + data.pc + "\")'/>";
+    }
+    if (typeof data.tablet !== "undefined")
         urlTablet = "<img src='images/view.png' class = 'img-edit'" +
-                    "onclick = 'showimage(\"" + data.tablet + "\")'/>";
-    if(typeof data.mobile !== "undefined")
+                "onclick = 'showFile(\"" + data.tablet + "\")'/>";
+    if (typeof data.mobile !== "undefined")
         urlMobile = "<img src='images/view.png' class = 'img-edit'" +
-                    "onclick = 'showimage(\"" + data.mobile + "\")'/>";
-    
+                "onclick = 'showFile(\"" + data.mobile + "\")'/>";
+
     if (!history)
         select = "<td><select onchange='changeSchedule(\"" + data.linkUrl + "\")' " +
                 "id = 'timetable' class = 'form-control'></select></td>";
-    
+
     var content = "<tr id = '" + id + "'><td>" + urlPC + "</td><td>" + urlTablet +
-                  "</td><td>" + urlMobile + "</td><td>" + html + "</td><td>" + time +
-                  "</td>" + select + "<td>" + "<img src='images/delete.png' class = 'img-edit'" +
-                  "onclick = 'deleteUrl(\"" + data.linkUrl + "\",\"#" + id + "\",\"" + time + "\")' /></td></tr>";
-          
+            "</td><td>" + urlMobile + "</td><td>" + html + "</td><td>" + time +
+            "</td>" + select + "<td>" + "<img src='images/delete.png' class = 'img-edit'" +
+            "onclick = 'showDialogDelete(\"" + data.linkUrl + "\",\"#" + id + "\",\"" + time + "\")' /></td></tr>";
+
     return content;
 };
 
-var showimage = function (link) {
-    var url = "showimage.htm?url=save/" + link;
-    var win = window.open(url, '_blank');
-    if (win)
-        focus();
-};
-
-var showhtml = function (link) {
-    var url = "showcontent.htm?url=save/" + link + "&&type=checked";
+var showFile = function (link) {
+    var url = "loadFile?url=" + link;
     var win = window.open(url, '_blank');
     if (win)
         focus();
@@ -244,29 +190,21 @@ var addOptionForSelect = function (frequency) {
     $('#timetable').val(frequency);
 };
 
-var existUrl = function (url) {
-    var result = true;
-    $.ajax({
-        url: url,
-        type: "HEAD",
-        error: function () {
-            result = false;
-        }
-    });
-    return result;
-};
-
 var changeSchedule = function (url) {
     var time = $('#timetable').val();
-    if (url == '') {
+    var filterParam = new Array();
+    if (url === '') {
         url = $('#urlHidden').val();
         time = $('#frequency').val();
     }
+    filterParam[filterParam.length] = new param("url", url);
+    filterParam[filterParam.length] = new param("time", time);
+    
     showSave(true);
     $.ajax({
         url: 'changeSchedule',
         type: 'get',
-        data: {url: url + "#*time=" + time},
+        data: {param: filterParam},
         success: function (data) {
             showSave(false);
         }, error: function (jqXHR, textStatus, errorThrown) {
@@ -277,25 +215,34 @@ var changeSchedule = function (url) {
     });
 };
 
+var showDialogDelete = function (url, id, time) {
+    dialog_delete_show(url, id, time);
+};
+
 var deleteUrl = function (url, id, time) {
     showSave(true);
+    var filterParam = new Array();
+    filterParam[filterParam.length] = new param("url", url);
+    filterParam[filterParam.length] = new param("time", time);
     $.ajax({
         url: 'deleteUrl',
         type: 'get',
-        data: {url: url + "#*time=" + time},
+        data: {param: filterParam},
         success: function (data) {
             if (data === "true") {
                 $(id).remove();
                 var rowCount = $('#myTable >tbody >tr').length;
-                if (rowCount == 0) {
+                if (rowCount === 0) {
                     $('#myTable').remove();
                     $('#schedule').hide();
                 }
+                dialog_delete_hide();
             }
             showSave(false);
         }, error: function (jqXHR, textStatus, errorThrown) {
             alert('error');
             showSave(false);
+            dialog_delete_hide();
             $('.container').css('opacity', '');
         }
     });

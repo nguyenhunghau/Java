@@ -1,12 +1,18 @@
 package Faber.DAO;
 
+//<editor-fold defaultstate="collapsed" desc="IMPORT">
 import Faber.Connection.MySQLConnect;
 import Faber.DTO.UrlDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import static java.time.OffsetTime.now;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+//</editor-fold>
 
 /**
  *
@@ -14,19 +20,13 @@ import java.util.List;
  */
 public class UrlDAO {
 
-    /**
-     * Get all url from database
-     *
-     * @param url
-     * @return
-     */
+    //<editor-fold defaultstate="collapsed" desc="GET LIST USL WITH URL AND USER">
     public List<UrlDTO> getListUrl(String url, String user) {
 
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         List<UrlDTO> list = new ArrayList<>();
-        int freequency = 0;
 
         try {
             String sql = "SELECT * FROM Url WHERE LinkUrl = ? and IdUser = ? ORDER BY TimeSave DESC";
@@ -48,8 +48,58 @@ public class UrlDAO {
                 urlDto.setHtml(rs.getString("Html"));
                 list.add(urlDto);
             }
-            
-        } catch (Exception ex) {
+
+        } catch (SQLException | NumberFormatException ex) {
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+                if (con != null) {
+                    con.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+        return list;
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="GET LIST URL WILL RUN IN CRONJOB">
+    public List<UrlDTO> getListUrl() {
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List<UrlDTO> list = new ArrayList<>();
+
+        try {
+            String sql = "SELECT IdUser, Frequent, LinkUrl, Pc, Html, max(TimeSave)"
+                    + " FROM Url GROUP BY LinkUrl  ORDER BY TimeSave DESC ";
+            con = (Connection) MySQLConnect.getConnection();
+            ps = (PreparedStatement) con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                java.sql.Date dateSave = rs.getDate("TimeSave");
+                int frequent = rs.getInt("Frequent");
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.add(Calendar.DAY_OF_YEAR, frequent * (-1)); 
+                if (cal.getTime().toString().split(" ")[0].equals(dateSave.toString())) {
+                    UrlDTO urlDto = new UrlDTO();
+                    urlDto.setIdUser(rs.getInt("IdUser"));
+                    urlDto.setLinkUrl(rs.getString("LinkUrl"));
+                    urlDto.setPc(rs.getString("Pc"));
+                    urlDto.setHtml(rs.getString("Html"));
+                    list.add(urlDto);
+                }
+            }
+
+        } catch (SQLException | NumberFormatException ex) {
         } finally {
             try {
                 if (rs != null) {
@@ -67,14 +117,9 @@ public class UrlDAO {
         return list;
     }
 
-    /**
-     * Check url exist in database or not
-     *
-     * @param url
-     * @param dateSave
-     * @param user
-     * @return
-     */
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="CHECK URL IS SAVED IN DATABASE IN CURRENT DATE">
     public UrlDTO checkUrl(String url, java.sql.Date dateSave, String user) {
 
         Connection con = null;
@@ -106,7 +151,7 @@ public class UrlDAO {
                     break;
                 }
             }
-        } catch (Exception ex) {
+        } catch (SQLException | NumberFormatException ex) {
         } finally {
             try {
                 if (rs != null) {
@@ -123,7 +168,16 @@ public class UrlDAO {
         }
         return urlDto;
     }
+    //</editor-fold>
     
+    //<editor-fold defaultstate="collapsed" desc="CHECK URL EXIST IN DATABASE OR NOT">
+    /**
+     * Check url exist in database or not
+     *
+     * @param url
+     * @param user
+     * @return
+     */
     public String checkUrl(String url, String user) {
 
         Connection con = null;
@@ -143,7 +197,7 @@ public class UrlDAO {
                 result = rs.getString("Html");
                 break;
             }
-        } catch (Exception ex) {
+        } catch (SQLException | NumberFormatException ex) {
         } finally {
             try {
                 if (rs != null) {
@@ -160,12 +214,13 @@ public class UrlDAO {
         }
         return result;
     }
-
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="ADD URL INTO DATABASE">
     /**
      * Add url into database
      *
-     * @param url
-     * @param timeSave
+     * @param urlDto
      * @return
      */
     public boolean addUrl(UrlDTO urlDto) {
@@ -200,7 +255,17 @@ public class UrlDAO {
             }
         }
     }
-
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="DELETE URL IN DATABASE">
+    /**
+     * Delete url from database
+     *
+     * @param url
+     * @param time
+     * @param user
+     * @return
+     */
     public boolean deleteUrl(String url, java.sql.Date time, String user) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -214,7 +279,7 @@ public class UrlDAO {
             ps.executeUpdate();
             return true;
 
-        } catch (Exception ex) {
+        } catch (SQLException | NumberFormatException ex) {
             return false;
         } finally {
             try {
@@ -228,7 +293,17 @@ public class UrlDAO {
             }
         }
     }
+    //</editor-fold>
     
+    //<editor-fold defaultstate="collapsed" desc="UPDATE FREQUENCY">
+     /**
+     * Update freequency in database
+     *
+     * @param url
+     * @param user
+     * @param freequency
+     * @return
+     */
     public boolean updateFrequency(String url, String user, String freequency) {
         Connection con = null;
         PreparedStatement ps = null;
@@ -237,12 +312,12 @@ public class UrlDAO {
             String sql = "UPDATE Url SET Frequent = ? WHERE LinkUrl = ? AND IdUser = ?";
             ps = (PreparedStatement) con.prepareStatement(sql);
             ps.setInt(1, Integer.valueOf(freequency));
-            ps.setString(2,  url);
+            ps.setString(2, url);
             ps.setInt(3, Integer.valueOf(user));
             ps.executeUpdate();
             return true;
 
-        } catch (Exception ex) {
+        } catch (SQLException | NumberFormatException ex) {
             return false;
         } finally {
             try {
@@ -256,4 +331,5 @@ public class UrlDAO {
             }
         }
     }
+    //</editor-fold>
 }

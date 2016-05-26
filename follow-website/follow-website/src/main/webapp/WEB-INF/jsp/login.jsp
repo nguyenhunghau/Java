@@ -50,7 +50,7 @@
                         <input id="password" name="password" type="password" class="text" value="${remember_password}" autocomplete="off"/>
                     </div>
                     <div style="padding:20px 0px 0px 0px ;">
-                        
+
                         <div style="float:right;padding:2px 0px ;">
                             <div> 
                                 <ul class="uibutton-group">
@@ -87,43 +87,44 @@
             <div class="copyright" > &copy; Copyright 2013-2014  All Rights Reserved <span class="tip"><a href="http://www.fabercompany.co.jp/" title="Faber Company" target='_blank'>Faber Company</a> </span> </div>
             <!-- // copyright-->
         </div>
-         <script src="js/jquery.min.js" type="text/javascript"></script>
+        <script src="js/jquery.min.js" type="text/javascript"></script>
         <script type='text/javascript' src='js/jquery-jrumble.js'></script>
         <script type='text/javascript' src='js/jquery.ui.min.js'></script>
         <script type='text/javascript' src='js/jquery.tipsy.js'></script>
         <script type='text/javascript' src='js/iphone.check.js'></script>
         <script type='text/javascript' src='js/login.js'></script>
         <script type="text/javascript">
-            $(document).ready(function() {
+            $(document).ready(function () {
                 $('#error_maintenance').hide();
                 $('#error').hide();
                 $(".formForgot").hide();
                 $("#username").focus();
-                $("#forgot_pw").click(function() {
+                $("#forgot_pw").click(function () {
                     $(".formLogin").hide();
                     $(".formForgot").show();
                     $("#email").focus();
                     return false;
                 });
-                $(".back_login").click(function() {
+                $(".back_login").click(function () {
                     $(".formLogin").show();
                     $(".formForgot").hide();
                     $("#username").focus();
                     return false;
                 });
-                $("#password").keyup(function(event) {
+                $("#password").keyup(function (event) {
                     if (event.keyCode == 13) {
                         Login();
                     }
                 });
-                $("#email").keyup(function(event) {
+                $("#email").keyup(function (event) {
                     if (event.keyCode == 13) {
                         Forgot();
                     }
                 });
             });
 
-            $('#but_login').on("click", function() {
+            $('#but_login').on("click", function () {
+                debugger;
                 Login();
             });
             function Login() {
@@ -136,13 +137,12 @@
                     return false;
                 }
                 hideTop();
-                //loading('Checking', 1);
                 checkLogin();
             }
-            var showErrorUsernamePassword = function() {
+            var showErrorUsernamePassword = function () {
                 showError("Wrong Username or password", 5000);
             };
-            var showErrorUsernameMiss = function() {
+            var showErrorUsernameMiss = function () {
                 showError("Please fill Username and password", 5000);
             };
         </script>

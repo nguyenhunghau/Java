@@ -65,6 +65,49 @@
 }
 
 /********************************/
+#popup_delete {
+    display: none;
+    background-color: #fff;
+    padding: 20px 20px;
+    border: 1px solid #ccc;
+    width: auto;
+    top: 25%;
+    margin-left: 40%;
+    position: absolute;
+    z-index: 1000;
+    min-height: 150px;
+}
+
+#popup_delete .pop_01{
+    margin-top: -30px;
+    padding-top: 30px;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 24px;
+    margin-bottom: 1em;
+}
+#popup_delete .pop_02{
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+#popup_delete .button{
+    overflow: hidden;
+    margin-top: 30px;
+}
+
+.get_ideads {
+    background: #4d90fe;
+    background-image: -webkit-linear-gradient(top, #4d90fe, #4787ed);
+    padding: 8px;
+    text-decoration: none;
+    display: inline-block;
+    border-color: #3079ed;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 2px;
+    cursor: pointer;
+}
 
 #popup_save_website_related{
     display: none;

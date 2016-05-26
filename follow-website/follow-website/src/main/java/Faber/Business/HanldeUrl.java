@@ -1,37 +1,29 @@
 package Faber.Business;
 
 //<editor-fold defaultstate="collapsed" desc="IMPORT">
+import Faber.Cronjob.SchedulerJob;
 import Faber.DAO.UrlDAO;
 import Faber.DTO.UrlDTO;
 import com.google.gson.Gson;
-import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
 import java.net.IDN;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,12 +34,11 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.SimpleScheduleBuilder;
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import static org.quartz.TriggerKey.triggerKey;
@@ -62,34 +53,44 @@ public class HanldeUrl {
 
     UrlDAO urlDao = new UrlDAO();
 
+    //<editor-fold defaultstate="collapsed" desc="SAVE A WEBSITE">
+    /**
+     * Save a website with url, type and user
+     *
+     * @param url
+     * @param type: capture or html or both
+     * @param user: id of user
+     * @return
+     * @throws SchedulerException
+     * @throws InterruptedException
+     */
     public String saveWebsite(String url, String type, String user) throws SchedulerException, InterruptedException {
         String currentTime = getCurrentTime();
         UrlDTO userDto = new UrlDTO();
         Gson gson = new Gson();
         String result = "";
         try {
-
-            String website = "save/" + user + "/" + currentTime;
-            String absolute = getClass().getProtectionDomain().getCodeSource().getLocation().toExternalForm();
-            absolute = absolute.replace("target/follow-website-1.0-SNAPSHOT/WEB-INF/classes/", "src/main/webapp/");
-            absolute = absolute.substring(5, absolute.length());
             //Create directory
-            String folder = absolute + website;
-            File file = new File(folder);
-            file.mkdir();
-            file = new File(folder + "/capture");
+            String data = user + "/" + currentTime;
+            String folderSave = "/usr/local/follow-website/" + data;
+            File file = new File(folderSave);
+            boolean a = file.mkdirs();
+            file = new File(folderSave + "/capture");
             file.mkdir();
             if (type.equals("html") || type.equals("both")) {
-                getHtml(url, folder, website);
-                userDto.setHtml(user + "/" + currentTime + "/" + url);
+                String linkSaveHtml = (url.split("://")[1].replaceAll("/", "_"))
+                        .replace("?", "+").replace("&", "+") + ".html";
+
+                getHtml(url, folderSave, data, linkSaveHtml);
+                userDto.setHtml(user + "/" + currentTime + "/" + linkSaveHtml);
             }
 
             if (type.equals("capture") || type.equals("both")) {
                 WebDriver driver = new PhantomJSDriver();
                 driver.get(url);
-                capturePC(driver, url, folder + "/capture/capturepc.jpg");
-                captureMobile(driver, url, folder + "/capture/capturemobile.jpg");
-                captureTablet(driver, url, folder + "/capture/capturetablet.jpg");
+                capturePC(driver, url, folderSave + "/capture/capturepc.jpg");
+                captureMobile(driver, url, folderSave + "/capture/capturemobile.jpg");
+                captureTablet(driver, url, folderSave + "/capture/capturetablet.jpg");
                 driver.close();
                 userDto.setPc(user + "/" + currentTime + "/capture/capturepc.jpg");
                 userDto.setTablet(user + "/" + currentTime + "/capture/capturetablet.jpg");
@@ -106,19 +107,71 @@ public class HanldeUrl {
             if (urlDao.addUrl(userDto)) {
                 result = gson.toJson(userDto);
             }
-            renameFile(absolute + "save/" + user, absolute + "save/abc");
-            Thread.sleep(5000);
-            renameFile(absolute + "save/abc", absolute + "save/" + user);
         } catch (ParseException ex) {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
     }
+    //</editor-fold>
 
-    private void getHtml(String url, String folder, String website) {
+    //<editor-fold defaultstate="collapsed" desc="GET PARAMETER">
+    public Map<String, String> getParameter(String queryString) {
+        Map<String, String> parameter = new HashMap<String, String>();
+        String value = null, name = null;
+        int i = 0;
+        try {
+            String[] pares = queryString.split("&");
+            for (String pare : pares) {
+                String[] nameAndValue = pare.split("=");
+                if (i % 2 == 0) {
+                    name = nameAndValue[1];
+                } else {
+                    value = nameAndValue[1];
+                }
+                if (value != null && name != null) {
+                    parameter.put(name, value);
+                    name = null;
+                    value = null;
+                }
+                i++;
+            }
+        } catch (Exception e) {
+        }
+        return parameter;
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="LOAD FILE">
+    public void loadFile(String fileName, HttpServletResponse response) throws IOException {
+        PrintWriter out = response.getWriter();
+        int i;
+        FileInputStream file = null;
+        try {
+            file = new FileInputStream(fileName);
+            while ((i = file.read()) != -1) {
+                out.write(i);
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            file.close();
+            out.close();
+        }
+    }
+    //</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="GET HTML FROM WEBSITE">
+    /**
+     * Get all html, css, js of website and save into folder
+     *
+     * @param url
+     * @param folder
+     * @param website
+     */
+    private void getHtml(String url, String folder, String data, String linkSaveHtml) {
 
         Document doc;
-        String htmlItem, htmlNew = null, nameFile, destinationFile;
+        String htmlItem, nameFile, destinationFile, htmlNew = null;
 
         try {
 
@@ -127,80 +180,60 @@ public class HanldeUrl {
                     .referrer("http://www.google.com")
                     .get();
 
-            Elements links = doc.select("[href]");
-            Elements medias = doc.select("[src]");
+            Elements links = doc.select("link[href]");
+            Elements medias = doc.select("script[src]");
             Element htmlTag = doc.select("html").first();
             String html = htmlTag.html();
 
-            //<editor-fold defaultstate="collapsed" desc="Save file css and change <a> element">
             for (Element element : links) {
 
                 String link = element.attr("abs:href");
-                if (link.equals("http://stackoverflow.com/questions/1066453/mysql-group-by-and-order-by?lastactivity")) {
-                    String afds = "link";
-                }
-
                 htmlNew = htmlItem = element.outerHtml();
-
-                if (element.tagName().equals("link")) {
-                    nameFile = link.substring(link.lastIndexOf("/") + 1).toLowerCase();
-                    String type = element.attr("type");
-                    if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
-                        nameFile = nameFile.split("\\?")[0];
-                    }
-                    destinationFile = folder + "/" + nameFile;
-                    if (type.equals("text/css")) {
-                        nameFile = copyFileStream(link, destinationFile);
-                    }
-
-                    if (nameFile.contains(".")) {
-                        htmlNew = htmlItem.replaceFirst(element.attr("href"), website + "/" + nameFile);
-                    }
-                } else {
-                    if (link.equals("")) {
-                        continue;
-                    }
-
-                    htmlItem = htmlItem.replace("&amp;", "&");
-                    htmlNew = htmlItem.replace(element.attr("href"), "showcontent.htm?url=" + website + "/" + link);
-
+                nameFile = link.substring(link.lastIndexOf("/") + 1).toLowerCase();
+                if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
+                    nameFile = nameFile.split("\\?")[0];
                 }
-                html = html.replace(htmlItem, htmlNew);
-            }
-            //</editor-fold>
-
-            //<editor-fold defaultstate="collapsed" desc="save file js">
-            for (Element element : medias) {
-                if (!element.tagName().equals("img")) {
-                    htmlItem = element.outerHtml();
-                    String src = element.attr("abs:src");
-                    nameFile = src.substring(src.lastIndexOf("/") + 1);
-
-                    if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
-                        nameFile = nameFile.split("\\?")[0];
-                    }
+                String type = element.attr("type");
+                if (type.equals("text/css") || nameFile.endsWith(".css")) {
 
                     destinationFile = folder + "/" + nameFile;
-
-                    if (nameFile.indexOf("jquery") == 0) {
-                        nameFile = copyFileStream(src, destinationFile);
-                    } else {
-                        nameFile = copyFile(src, destinationFile, website);
-                    }
-                    htmlNew = htmlItem.replace(element.attr("src"), website + "/" + nameFile);
+                    nameFile = copyFileStream(link, destinationFile);
+                    htmlNew = htmlItem.replace(element.attr("href"),
+                            "loadFile?url=" + data + "/" + nameFile);
                     html = html.replace(htmlItem, htmlNew);
                 }
             }
-            //</editor-fold>
 
-            //Change html and save file
-            html = html.replace("document.location", "").replace("“", "&#8220");
-            String linkSave = folder + "/" + (url.replaceAll("/", "**")).replace("?", "++") + ".html";
-            saveFile(html, linkSave);
+            for (Element element : medias) {
+                htmlItem = element.outerHtml();
+                String src = element.attr("abs:src");
+                nameFile = src.substring(src.lastIndexOf("/") + 1);
+
+                if (nameFile.lastIndexOf("?") > nameFile.indexOf(".")) {
+                    nameFile = nameFile.split("\\?")[0];
+                }
+
+                destinationFile = folder + "/" + nameFile;
+                nameFile = copyFileStream(src, destinationFile);
+                htmlNew = htmlItem.replace(element.attr("src"),
+                        "loadFile?url=" + data + "/" + nameFile);
+                html = html.replace(htmlItem, htmlNew);
+            }
+            html = html.replace("”", "&quot;").replace("“", "&quot;");
+            saveFile(html, folder + "/" + linkSaveHtml);
         } catch (IOException e) {
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="GET LIST WEBSITE FROM DATABASE">
+    /**
+     * Get list UrlDTO with url in database
+     *
+     * @param url
+     * @param user
+     * @return
+     */
     public String getListWebsite(String url, String user) {
 
         try {
@@ -213,11 +246,23 @@ public class HanldeUrl {
         }
 
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="CHECK URL EXIST OR NOT IN DATABASE">
     public String checkUrl(String url, String user) {
         return urlDao.checkUrl(url, user);
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="CHECK URL IS SAVED ON CURRENT DATE">
+    /**
+     * Check url is saved or not on current date
+     *
+     * @param url
+     * @param dateSave
+     * @param user
+     * @return
+     */
     public String checkUrl(String url, java.sql.Date dateSave, String user) {
 
         String result = "false";
@@ -233,7 +278,17 @@ public class HanldeUrl {
         }
         return result;
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="DELETE URL">
+    /**
+     * Delete a url in database with time and user
+     *
+     * @param url
+     * @param time
+     * @param user
+     * @return
+     */
     public boolean deleteUrl(String url, String time, String user) {
 
         try {
@@ -246,62 +301,74 @@ public class HanldeUrl {
             return false;
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="CREATE CRONJOB">
+    /**
+     * Create a cronjob on server
+     *
+     * @param url
+     * @param type: html or capture or both
+     * @param user: id of user
+     * @throws InterruptedException
+     */
     public void createCronjob(String url, String type, String user) throws InterruptedException {
 
         Scheduler scheduler;
         try {
-            String result = urlDao.checkUrl(url, user);
-            if (!result.equals("false")) {
+            scheduler = new StdSchedulerFactory().getScheduler();
+            if (existCronjob(scheduler)) {
                 return;
             }
-            scheduler = new StdSchedulerFactory().getScheduler();
             JobDetail job = JobBuilder.newJob(SchedulerJob.class)
-                    .withIdentity(url, user).build();
-            Trigger trigger = TriggerBuilder.newTrigger().withIdentity(url, user)
-                    .startAt(new Date(Calendar.getInstance().getTimeInMillis() + 1000 * 60 * 60 * 24))
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInHours(24)
-                            .repeatForever()).build();
+                    .withIdentity("cronjob").build();
+            Trigger trigger = TriggerBuilder
+                    .newTrigger()
+                    .withIdentity("cronjob")
+                    .withSchedule(
+                            CronScheduleBuilder.cronSchedule("0 0 1-5 * * ?"))
+                    .build();
 
             //schedule it
             scheduler.start();
-            job.getJobDataMap().put("url", url);
-            job.getJobDataMap().put("type", type);
-            job.getJobDataMap().put("user", user);
             scheduler.scheduleJob(job, trigger);
         } catch (SchedulerException ex) {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //</editor-fold>
 
-    public void updateCronjob(String url, String time, String user) {
+    //<editor-fold defaultstate="collapsed" desc="CHECK CRONJOB EXIST OR NOT">
+    /**
+     * Check a cronjob
+     *
+     * @param scheduler
+     */
+    private boolean existCronjob(Scheduler scheduler) {
 
-        Scheduler scheduler;
+        boolean result = false;
         try {
-            //Update database
-            urlDao.updateFrequency(url, user, time);
-            scheduler = new StdSchedulerFactory().getScheduler();
-            Trigger oldTrigger = scheduler.getTrigger(triggerKey(url, user));
-            TriggerBuilder tb = oldTrigger.getTriggerBuilder();
+            Trigger oldTrigger = scheduler.getTrigger(triggerKey("cronjob"));
+            if (oldTrigger != null) {
+                result = true;
+            }
+            //TriggerBuilder tb = oldTrigger.getTriggerBuilder();
 
-            Trigger newTrigger = tb.startAt(new Date(Calendar.getInstance().getTimeInMillis() + 1000 * 60 * 60 * 24)).withSchedule(simpleSchedule()
-                    .withIntervalInHours(Integer.parseInt(time) * 24)
-                    .repeatForever())
-                    .build();
-            scheduler.rescheduleJob(oldTrigger.getKey(), newTrigger);
         } catch (SchedulerException ex) {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        return result;
     }
+    //</editor-fold>
 
-    private void renameFile(String oldFile, String newFile) {
-
-        File file = new File(oldFile);
-        File fileNew = new File(newFile);
-        file.renameTo(fileNew);
-    }
-
+    //<editor-fold defaultstate="collapsed" desc="CAPTURE WEBSITE ON PC">
+    /**
+     * Capture a website with UI on PC
+     *
+     * @param driver
+     * @param url
+     * @param destinationFile
+     */
     private void capturePC(WebDriver driver, String url, String destinationFile) {
 
         try {
@@ -312,7 +379,16 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="CAPTURE WEBSITE ON MOBILE">
+    /**
+     * Capture a website with UI on Mobile
+     *
+     * @param driver
+     * @param url
+     * @param destinationFile
+     */
     private void captureMobile(WebDriver driver, String url, String destinationFile) {
 
         try {
@@ -323,7 +399,16 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="CAPTURE WEBSITE ON TABLET">
+    /**
+     * Capture a website with UI on Tablet
+     *
+     * @param driver
+     * @param url
+     * @param destinationFile
+     */
     private void captureTablet(WebDriver driver, String url, String destinationFile) {
 
         try {
@@ -334,75 +419,14 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="GET CURRENT TIME">
     /**
-     * If link doesn't begin by http/https, plus domain of url
+     * Get current time
      *
-     * @param url
      * @return
      */
-    private String createLink(String url, String attribute) throws IOException {
-
-        String result = "";
-        String realAttribute = attribute;
-        if (attribute.length() <= 3) {
-            return "";
-        }
-        if (attribute.indexOf("http") == 0) {
-            return attribute;
-        }
-        if (attribute.indexOf("//") == 0) {
-            return "http:" + attribute;
-        }
-
-        char beginLetter = realAttribute.charAt(0);
-        if (beginLetter == '\'' || beginLetter == '\"') {
-            realAttribute = realAttribute.substring(1, realAttribute.lastIndexOf(beginLetter));
-        }
-
-        result = getWebsite(url) + "/" + realAttribute;
-        if (!existUrl(result)) {
-            String headUrl = url;
-            int counter = realAttribute.split("../").length - 1;
-            if (counter > 0) {
-                realAttribute = realAttribute.substring(realAttribute.lastIndexOf("../") + 3);
-            }
-            for (int i = 0; i < counter; i++) {
-                headUrl = headUrl.substring(0, headUrl.lastIndexOf("/"));
-
-            }
-            result = headUrl + "/" + realAttribute;
-        }
-        return result;
-    }
-
-    /**
-     * Get domain from a url
-     *
-     * @param url
-     * @return
-     */
-    private String getWebsite(String url) {
-
-        String domainName = url;
-
-        int index = domainName.indexOf("://");
-        String http = domainName.split("://")[0] + "://";
-        if (index != -1) {
-            // keep everything after the "://"
-            domainName = domainName.substring(index + 3);
-        }
-
-        index = domainName.indexOf('/');
-
-        if (index != -1) {
-            // keep everything before the '/'
-            domainName = domainName.substring(0, index);
-        }
-
-        return http + domainName;
-    }
-
     private String getCurrentTime() {
 
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss.SSS");
@@ -410,70 +434,16 @@ public class HanldeUrl {
         String strDate = sdfDate.format(now);
         return strDate;
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="COPY FILE TYPE STREAM FROM URL">
     /**
-     * Read content of fileUrl and write into destinationFile
+     * Copy file by stream
      *
      * @param fileUrl
      * @param destinationFile
-     * @param linkWeb
      * @return
      */
-    private String copyFile(String fileUrl, String destinationFile, String linkWeb) {
-
-        String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
-        String fileName = destinationFile.substring(destinationFile.lastIndexOf("/") + 1);
-        String tailName = "", newName = "";
-        HashMap<String, String> mapString = new HashMap();
-        if (fileName.contains(".")) {
-            tailName = fileName.substring(fileName.lastIndexOf("."));
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        }
-
-        try {
-            try (PrintWriter writer = new PrintWriter(root + fileName + tailName, "UTF-8");
-                    BufferedReader in = new BufferedReader(new InputStreamReader(new URL(fileUrl).openStream(), "UTF-8"))) {
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    inputLine = URLDecoder.decode(inputLine, "utf-8");
-                    if (inputLine.contains("href=\"")) {
-                        String source = inputLine.substring(inputLine.lastIndexOf("href=\"") + 6);
-                        source = source.substring(0, source.indexOf("\""));
-                        inputLine = inputLine.replace(source, "showcontent.htm?url=" + linkWeb + source);
-                    }
-
-                    if (inputLine.contains("<script") && inputLine.contains("src=\\\"")) {
-                        String source = inputLine.substring(inputLine.lastIndexOf("src=\\\"") + 6);
-                        source = source.substring(0, source.indexOf("\\\""));
-                        String nameFile = source.substring(source.lastIndexOf("/"));
-                        nameFile = nameFile.substring(0, nameFile.lastIndexOf(".")) + "_faber.js";
-                        String newLink = createLink(fileUrl, source);
-                        inputLine = inputLine.replace(source, linkWeb + nameFile);
-                        String linkSave = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1) + nameFile;
-                        copyFile(newLink, linkSave, linkWeb);
-                        mapString.put(source, nameFile);
-                    }
-                    writer.println(URLDecoder.decode(inputLine, "utf8"));
-                }
-                in.close();
-                writer.close();
-
-                if (mapString.size() > 0) {
-                    String text = new String(Files.readAllBytes(Paths.get(root + fileName + tailName)), StandardCharsets.UTF_8);
-                    PrintWriter write = new PrintWriter(root + fileName + tailName, "UTF-8");
-                    for (Map.Entry<String, String> entry : mapString.entrySet()) {
-                        text = text.replace(entry.getKey(), entry.getValue());
-                    }
-                    write.println(text);
-                    write.close();
-                }
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return fileName + tailName;
-    }
-
     private String copyFileStream(String fileUrl, String destinationFile) {
 
         String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
@@ -510,51 +480,9 @@ public class HanldeUrl {
         }
         return fileName + tailName;
     }
+    //</editor-fold>
 
-    /**
-     * Read content of file css fileUrl and write into destinationFile
-     *
-     * @param fileUrl
-     * @param destinationFile
-     * @return
-     */
-    private String copyFileCss(String fileUrl, String destinationFile) {
-
-        String root = destinationFile.substring(0, destinationFile.lastIndexOf("/") + 1);
-        String fileName = destinationFile.substring(destinationFile.lastIndexOf("/") + 1);
-        String tailName = "";
-        InputStream input = null;
-        FileOutputStream output = null;
-
-        if (fileName.contains(".")) {
-            tailName = fileName.substring(fileName.lastIndexOf("."));
-            fileName = fileName.substring(0, fileName.lastIndexOf("."));
-        }
-        try {
-
-            URL url = new URL(fileUrl);
-            File file = new File(root + fileName + tailName);
-            while (file.exists()) {
-                fileName += "c";
-                file = new File(root + fileName + tailName);
-            }
-
-            try (
-                    PrintWriter writer = new PrintWriter(root + fileName + tailName, "UTF-8");
-                    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {
-                String inputLine;
-                while ((inputLine = in.readLine()) != null) {
-                    writer.println(inputLine);
-                }
-                in.close();
-                writer.close();
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return fileName + tailName;
-    }
-
+    //<editor-fold defaultstate="collapsed" desc="SAVE HTML INTO FILE IN LOCAL">
     private void saveFile(String content, String destinationFile) {
         try (PrintWriter writer = new PrintWriter(destinationFile, "UTF-8")) {
             writer.println(content);
@@ -562,28 +490,15 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    //</editor-fold>
 
+    //<editor-fold defaultstate="collapsed" desc="FORMAT URL">
     /**
-     * Check url exist or not
+     * Change url with correct format
      *
      * @param url
      * @return
-     * @throws IOException
      */
-    private boolean existUrl(String url) throws IOException {
-
-        try {
-            HttpURLConnection.setFollowRedirects(false);
-            HttpURLConnection con
-                    = (HttpURLConnection) new URL(url).openConnection();
-            con.setRequestMethod("HEAD");
-            return (con.getResponseCode() == HttpURLConnection.HTTP_OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public String formatUrl(String url) {
         if (url.equals("") || url == null || url.length() > 63) {
             return url;
@@ -593,7 +508,15 @@ public class HanldeUrl {
             result = result.substring(0, result.length() - 1);
         }
         return result;
-
     }
-
+    //</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="CHANGE SCHEDULE">
+    public void changeSchedule(String url, String user, String freequency) {
+        try {
+            urlDao.updateFrequency(url, user, freequency);
+        } catch (Exception e) {
+        }
+    }
+   //</editor-fold>
 }

@@ -16,7 +16,7 @@
         $(document).ready(function () {
             $('#schedule').hide();
             $('#btn_save').click(function () {
-                saveWebsite('','#html','#capture');
+                saveWebsite('', '#html', '#capture');
             });
 
             $('#btn_view').click(function () {
@@ -32,12 +32,14 @@
     <body>
         <%
             HttpSession sessions = request.getSession();
-            if(session.getAttribute("account") == null)
+            if (session.getAttribute("account") == null) {
                 response.sendRedirect("login.htm");
+            }
         %>
         <jsp:include page="popupWindow/load.jsp"/>
         <jsp:include page="popupWindow/save.jsp"/>
         <jsp:include page="popupWindow/savewindow.jsp"/>
+        <jsp:include page="popupWindow/popupDelete.jsp"/>
 
         <div class="container">
             <div class="row" style="margin-top: 50px;padding: 20px;">

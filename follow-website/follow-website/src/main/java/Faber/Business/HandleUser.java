@@ -36,9 +36,8 @@ public class HandleUser {
         }
         return false;
     }
-    
-    
-     private String encryptMD5(String input) {
+
+    private String encryptMD5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes());
@@ -52,6 +51,4 @@ public class HandleUser {
             throw new RuntimeException(e);
         }
     }
-
-
 }

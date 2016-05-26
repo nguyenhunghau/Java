@@ -58,6 +58,7 @@
         <url-pattern>/changeSchedule</url-pattern>
         <url-pattern>/deleteUrl</url-pattern>
         <url-pattern>/viewHistory</url-pattern>
+        <url-pattern>/loadFile</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UserServlet</servlet-name>

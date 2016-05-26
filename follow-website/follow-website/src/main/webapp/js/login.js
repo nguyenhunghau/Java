@@ -43,7 +43,7 @@ function hideTop() {
 }
 function loading(name, overlay) {
     $('body').append('<div id="overlay"></div><div id="preloader">' + name + '..</div>');
-    if (overlay == 1) {
+    if (overlay === 1) {
         $('#overlay').css('opacity', 0.1).fadeIn(function () {
             $('#preloader').fadeIn();
         });
@@ -62,7 +62,6 @@ var checkLogin = function () {
     var user = new Object();
     user.username = $("#username").val();
     user.password = $("#password").val();
-    debugger;
     $.ajax({
         url: "checkLogin",
         type: "POST",
@@ -70,7 +69,7 @@ var checkLogin = function () {
         success: function (response) {
             debugger;
             var result = $.trim(response);
-            if (result == "true") {
+            if (result === "true") {
                 $("#login").animate({opacity: 1, top: '49%'}, 200, function () {
                     $('.userbox').show().animate({opacity: 1}, 500);
                     $("#login").animate({opacity: 0, top: '60%'}, 500, function () {
@@ -83,7 +82,6 @@ var checkLogin = function () {
                 setTimeout("window.location.href='index.htm'", 3000);
             } else {
                 showErrorUsernamePassword();
-                unloading();
             };
         }
     });

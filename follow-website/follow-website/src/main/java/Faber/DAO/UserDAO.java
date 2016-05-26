@@ -13,6 +13,12 @@ import java.sql.SQLException;
  */
 public class UserDAO {
 
+    /**
+     * Login
+     * @param user
+     * @return
+     * @throws SQLException 
+     */
     public String checkLogin(UserDTO user) throws SQLException {
 
         Connection con = null;

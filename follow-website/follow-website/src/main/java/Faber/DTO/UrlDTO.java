@@ -1,7 +1,6 @@
 package Faber.DTO;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 /**
  *
@@ -18,7 +17,7 @@ public class UrlDTO {
     private String tablet;
     private String mobile;
     private String html;
-    
+
     public int getId() {
         return id;
     }
