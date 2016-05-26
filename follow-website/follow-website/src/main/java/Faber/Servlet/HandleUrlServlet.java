@@ -33,7 +33,7 @@ public class HandleUrlServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String path = request.getServletPath();
 
-        String url = request.getParameter("url");
+        String url = handleUrl.formatUrl(request.getParameter("url"));
         String result = "";
         if (session.getAttribute("account") == null) {
             response.sendRedirect("login.htm");
@@ -41,14 +41,14 @@ public class HandleUrlServlet extends HttpServlet {
         }
         String user = (String) session.getAttribute("account");
         try {
-            
+
             //<editor-fold defaultstate="collapsed" desc="VIEW HISTORY">
             if (path.equals("/viewHistory")) {
                 result = handleUrl.getListWebsite(url, user);
                 out.print(result);
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="GET CONTENT OF WEBSITE">
             if (path.equals("/getContentWebsite")) {
                 String queryString = request.getQueryString();
@@ -62,12 +62,11 @@ public class HandleUrlServlet extends HttpServlet {
                 result = handleUrl.checkUrl(urlReal, dateSave, user);
                 if (result.equals("false")) {
                     result = handleUrl.saveWebsite(urlReal, type, user);
-                    handleUrl.createCronjob(urlReal, type, user);
                 }
                 out.print(result);
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="CHANGE SCHEDULE">
             if (path.equals("/changeSchedule")) {
                 String queryString = request.getQueryString();
@@ -78,13 +77,13 @@ public class HandleUrlServlet extends HttpServlet {
                 handleUrl.changeSchedule(url, user, time);
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="CHECK URL">
             if (path.equals("/checkUrl")) {
                 out.print(handleUrl.checkUrl(url, user));
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="DELETE URL">
             if (path.equals("/deleteUrl")) {
                 String queryString = request.getQueryString();
@@ -95,14 +94,14 @@ public class HandleUrlServlet extends HttpServlet {
                 out.print(handleUrl.deleteUrl(url, time, user));
             }
             //</editor-fold>
-            
+
             //<editor-fold defaultstate="collapsed" desc="LOAD FILE">
             if (path.equals("/loadFile")) {
                 String fileName = "/usr/local/follow-website/" + url;
                 handleUrl.loadFile(fileName, response);
             }
             //</editor-fold>
-            
+
         } catch (SchedulerException | InterruptedException ex) {
             Logger.getLogger(HandleUrlServlet.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import static java.time.OffsetTime.now;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -77,19 +78,21 @@ public class UrlDAO {
         List<UrlDTO> list = new ArrayList<>();
 
         try {
-            String sql = "SELECT IdUser, Frequent, LinkUrl, Pc, Html, max(TimeSave)"
-                    + " FROM Url GROUP BY LinkUrl  ORDER BY TimeSave DESC ";
+            String sql = "SELECT IdUser, Frequent, LinkUrl, Pc, Html, max(TimeSave) as time"
+                            + " FROM Url GROUP BY LinkUrl  ORDER BY TimeSave DESC ";
             con = (Connection) MySQLConnect.getConnection();
             ps = (PreparedStatement) con.prepareStatement(sql);
             rs = ps.executeQuery();
 
             while (rs.next()) {
-                java.sql.Date dateSave = rs.getDate("TimeSave");
+                java.sql.Date dateSave = rs.getDate("time");
                 int frequent = rs.getInt("Frequent");
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(new Date());
                 cal.add(Calendar.DAY_OF_YEAR, frequent * (-1)); 
-                if (cal.getTime().toString().split(" ")[0].equals(dateSave.toString())) {
+                SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String time = simpleFormat.format(cal.getTime());
+                if (time.equals(dateSave.toString())) {
                     UrlDTO urlDto = new UrlDTO();
                     urlDto.setIdUser(rs.getInt("IdUser"));
                     urlDto.setLinkUrl(rs.getString("LinkUrl"));

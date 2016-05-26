@@ -1,42 +1,52 @@
 package Faber.Cronjob;
 
+//<editor-fold defaultstate="collapsed" desc="IMPORT">
 import Faber.Business.HanldeUrl;
-import Faber.DAO.UrlDAO;
-import Faber.DTO.UrlDTO;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.List;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
+//</editor-fold>
 
 /**
  *
  * @author Nguyen Hung Hau
  */
-public class SchedulerJob implements Job {
-
-    HanldeUrl hanlde = new HanldeUrl();
-    UrlDAO urlDao = new UrlDAO();
+public class SchedulerJob implements ServletContextListener {
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void contextInitialized(ServletContextEvent contextEvent) {
+        Scheduler scheduler;
         try {
-            String type = "both";
-            List<UrlDTO> listUrl = urlDao.getListUrl();
-            for (UrlDTO url : listUrl) {
-                if (url.getHtml() == null) {
-                    type = "capture";
-                }
-                if (url.getPc() == null) {
-                    type = "html";
-                }
-                hanlde.saveWebsite(url.getLinkUrl(), type, String.valueOf(url.getIdUser()));
-            }
-        } catch (Exception e) {
+            scheduler = new StdSchedulerFactory().getScheduler();
+            JobDetail job = JobBuilder.newJob(ExecuteSchedulerJob.class)
+                    .withIdentity("cronjob").build();
+            Trigger trigger = TriggerBuilder
+                    .newTrigger()
+                    .withIdentity("cronjob")
+                    .withSchedule(
+                            CronScheduleBuilder.cronSchedule("0 0 1-5 * * ?"))
+                    .build();
+
+            //schedule it
+            scheduler.start();
+            scheduler.scheduleJob(job, trigger);
+        } catch (SchedulerException ex) {
+            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

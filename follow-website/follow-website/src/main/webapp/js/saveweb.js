@@ -42,16 +42,7 @@ var saveWebsite = function (urlPara, idHtml, idCapture) {
             data: {para: filterParam},
             success: function (data) {
                 var result = JSON.parse(data);
-                if (idHtml === '#htmlWindow') {
-                    if (typeof result.html !== "undefined") {
-                        window.location.replace("showcontent.htm?url=save/" + result.html + "&&type=checked");
-                    } else {
-                        window.location.replace("showcontent.htm?url=save/" + result.pc);
-                    }
-                } else {
-                    createTable(result);
-                }
-
+                createTable(result);
                 showSave(false);
             }, error: function (jqXHR, textStatus, errorThrown) {
                 alert('error');

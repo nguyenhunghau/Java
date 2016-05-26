@@ -17,9 +17,9 @@
         });
     });
     var dialog_save_website_show = function (link) {
-
+        debugger;
+        $("#p_link").html("");
         $("#p_link").append(link);
-        $("#link").attr("href", "showcontent.htm?url=" + link.substring(29));
         $("#popup_save_website_related").stop().fadeTo(500, 1);
         $("#overlay").stop().fadeTo(500, 0.7);
         $(".FixedHeader_Header").attr("id", "content").css("z-index", "1001").css("min-width", "584px");

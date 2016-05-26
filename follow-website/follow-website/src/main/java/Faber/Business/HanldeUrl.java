@@ -1,7 +1,6 @@
 package Faber.Business;
 
 //<editor-fold defaultstate="collapsed" desc="IMPORT">
-import Faber.Cronjob.SchedulerJob;
 import Faber.DAO.UrlDAO;
 import Faber.DTO.UrlDTO;
 import com.google.gson.Gson;
@@ -34,15 +33,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
-import static org.quartz.TriggerKey.triggerKey;
-import org.quartz.impl.StdSchedulerFactory;
 //</editor-fold>
 
 /**
@@ -78,11 +69,8 @@ public class HanldeUrl {
             file = new File(folderSave + "/capture");
             file.mkdir();
             if (type.equals("html") || type.equals("both")) {
-                String linkSaveHtml = (url.split("://")[1].replaceAll("/", "_"))
-                        .replace("?", "+").replace("&", "+") + ".html";
-
-                getHtml(url, folderSave, data, linkSaveHtml);
-                userDto.setHtml(user + "/" + currentTime + "/" + linkSaveHtml);
+                getHtml(url, folderSave, data);
+                userDto.setHtml(user + "/" + currentTime + "/index.html");
             }
 
             if (type.equals("capture") || type.equals("both")) {
@@ -168,7 +156,7 @@ public class HanldeUrl {
      * @param folder
      * @param website
      */
-    private void getHtml(String url, String folder, String data, String linkSaveHtml) {
+    private void getHtml(String url, String folder, String data) {
 
         Document doc;
         String htmlItem, nameFile, destinationFile, htmlNew = null;
@@ -220,7 +208,8 @@ public class HanldeUrl {
                 html = html.replace(htmlItem, htmlNew);
             }
             html = html.replace("”", "&quot;").replace("“", "&quot;");
-            saveFile(html, folder + "/" + linkSaveHtml);
+            html += "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />";
+            saveFile(html, folder + "/index.html");
         } catch (IOException e) {
         }
     }
@@ -300,64 +289,6 @@ public class HanldeUrl {
             Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
-    }
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="CREATE CRONJOB">
-    /**
-     * Create a cronjob on server
-     *
-     * @param url
-     * @param type: html or capture or both
-     * @param user: id of user
-     * @throws InterruptedException
-     */
-    public void createCronjob(String url, String type, String user) throws InterruptedException {
-
-        Scheduler scheduler;
-        try {
-            scheduler = new StdSchedulerFactory().getScheduler();
-            if (existCronjob(scheduler)) {
-                return;
-            }
-            JobDetail job = JobBuilder.newJob(SchedulerJob.class)
-                    .withIdentity("cronjob").build();
-            Trigger trigger = TriggerBuilder
-                    .newTrigger()
-                    .withIdentity("cronjob")
-                    .withSchedule(
-                            CronScheduleBuilder.cronSchedule("0 0 1-5 * * ?"))
-                    .build();
-
-            //schedule it
-            scheduler.start();
-            scheduler.scheduleJob(job, trigger);
-        } catch (SchedulerException ex) {
-            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    //</editor-fold>
-
-    //<editor-fold defaultstate="collapsed" desc="CHECK CRONJOB EXIST OR NOT">
-    /**
-     * Check a cronjob
-     *
-     * @param scheduler
-     */
-    private boolean existCronjob(Scheduler scheduler) {
-
-        boolean result = false;
-        try {
-            Trigger oldTrigger = scheduler.getTrigger(triggerKey("cronjob"));
-            if (oldTrigger != null) {
-                result = true;
-            }
-            //TriggerBuilder tb = oldTrigger.getTriggerBuilder();
-
-        } catch (SchedulerException ex) {
-            Logger.getLogger(HanldeUrl.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
     }
     //</editor-fold>
 
@@ -500,17 +431,20 @@ public class HanldeUrl {
      * @return
      */
     public String formatUrl(String url) {
-        if (url.equals("") || url == null || url.length() > 63) {
-            return url;
+        String result = url;
+        if (url == null || url.equals("")) {
+            return result;
         }
-        String result = IDN.toASCII(url);
+        if (url.length() <= 63) {
+            result = IDN.toASCII(url);
+        }
         while (result.matches(".*[#/?]$")) {
             result = result.substring(0, result.length() - 1);
         }
         return result;
     }
     //</editor-fold>
-    
+
     //<editor-fold defaultstate="collapsed" desc="CHANGE SCHEDULE">
     public void changeSchedule(String url, String user, String freequency) {
         try {
@@ -518,5 +452,5 @@ public class HanldeUrl {
         } catch (Exception e) {
         }
     }
-   //</editor-fold>
+    //</editor-fold>
 }
