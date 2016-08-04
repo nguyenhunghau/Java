@@ -3,7 +3,6 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <html lang="en">
-
     <title>Save website</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/style.css" rel="stylesheet" type="text/css"/>
@@ -33,7 +32,7 @@
         <%
             HttpSession sessions = request.getSession();
             if (session.getAttribute("account") == null) {
-                response.sendRedirect("login.htm");
+                response.sendRedirect("login.htm?url=index.htm");
             }
         %>
         <jsp:include page="popupWindow/load.jsp"/>

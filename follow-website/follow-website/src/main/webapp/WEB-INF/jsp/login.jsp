@@ -92,7 +92,7 @@
         <script type='text/javascript' src='js/jquery.ui.min.js'></script>
         <script type='text/javascript' src='js/jquery.tipsy.js'></script>
         <script type='text/javascript' src='js/iphone.check.js'></script>
-        <script type='text/javascript' src='js/login.js'></script>
+        <script type='text/javascript' src='js/login.js?ver=1.0'></script>
         <script type="text/javascript">
             $(document).ready(function () {
                 $('#error_maintenance').hide();

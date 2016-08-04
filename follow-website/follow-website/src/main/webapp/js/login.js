@@ -67,7 +67,6 @@ var checkLogin = function () {
         type: "POST",
         data: {json: JSON.stringify(user)},
         success: function (response) {
-            debugger;
             var result = $.trim(response);
             if (result === "true") {
                 $("#login").animate({opacity: 1, top: '49%'}, 200, function () {
@@ -79,10 +78,23 @@ var checkLogin = function () {
                         });
                     });
                 });
-                setTimeout("window.location.href='index.htm'", 3000);
+                var urlRedirect = getParameter('url');
+                if(urlRedirect === '')
+                    urlRedirect = 'index.htm';
+                setTimeout("window.location.href='" + urlRedirect + "'", 3000);
             } else {
                 showErrorUsernamePassword();
             };
         }
     });
 };
+
+var getParameter = function (name) {
+    var results = new RegExp('[\?&]' + name + '=([^#]*)').exec(window.location.href);
+    if (results === null) {
+        return '';
+    } else {
+        return results[1] || 0;
+    }
+};
+

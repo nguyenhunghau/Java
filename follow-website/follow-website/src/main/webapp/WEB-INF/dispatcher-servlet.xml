@@ -21,6 +21,7 @@
             <props>
                 <prop key="index.htm">indexController</prop>
                 <prop key="login.htm">loginController</prop>
+                <prop key="google-location.htm">google-locationController</prop>
             </props>
         </property>
     </bean>
@@ -40,5 +41,8 @@
      <bean name="loginController"
           class="org.springframework.web.servlet.mvc.ParameterizableViewController"
           p:viewName="login" />
+     <bean name="google-locationController"
+          class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+          p:viewName="google-location" />
 
 </beans>
